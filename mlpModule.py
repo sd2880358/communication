@@ -19,7 +19,7 @@ N = data2['N']
 X = data2['X']
 
 def table_data(my_data, snr, inr, cons, label):
-    block = my_data.shape[1]
+    block = my_data.shape[0]
     my_data_size = my_data.shape[0] * block
     my_data_div = my_data.T.reshape(my_data_size,)
     snr_array = np.array([snr]*my_data_size)
@@ -67,6 +67,7 @@ def build_and_compile_model(norm):
     model = keras.Sequential([
     norm,
     layers.Dense(50, activation='relu'),
+    layers.Dense(50, activation='relu'),
     layers.Dense(2)
     ])
 
@@ -79,7 +80,7 @@ dnn_signal_model = build_and_compile_model(normalizer)
 history = dnn_signal_model.fit(
     train_features, train_labels,
     validation_split=0.2,
-    verbose=0, epochs=1000)
+    verbose=0, epochs=500)
 
 def plot_loss(history):
     plt.plot(history.history['loss'], label='loss')
@@ -99,8 +100,8 @@ y = dnn_signal_model.predict(test_features)
 
 def plot_compare(y):
     labels = test_labels.to_numpy();
-    plt.scatter(labels[:,0], labels[:,1], color='black',label='Data')
-    plt.plot(y[:,0], y[:,1],  'o', color='red', label='Predictions')
+    plt.scatter(labels[:50,0], labels[:50,1], color='black',label='Data')
+    plt.plot(y[:50,0], y[:50,1],  'o', color='red', label='Predictions')
     plt.xlabel('x')
     plt.ylabel('y')
     plt.legend()
