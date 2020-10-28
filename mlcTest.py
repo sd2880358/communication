@@ -99,5 +99,6 @@ y1 = dnn_real_model.predict(test_features)
 hist = pd.DataFrame(history.history)
 hist['epoch'] = history.epoch
 hist.tail()
+loss = get_total_loss(y1, test_labels.to_numpy())
+hist.append({'test_loss':loss}, ignore_index=True)
 hist.to_csv('./28/out.csv', index=False)
-np.savetext(get_total_loss(y1, test_labels.to_numpy()))
