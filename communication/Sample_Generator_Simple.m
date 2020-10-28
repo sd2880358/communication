@@ -79,6 +79,5 @@ Y = P_x*X + P_i*I + N;
 
 
 
-save ../SNR30/my_labels.mat L_Constellations L_Interference L_S_x L_S_i
-save ../SNR30/my_data.mat Y
-save ../SNR30/mysambol.mat X I N
+save SNR30labels.mat L_Constellations L_Interference L_S_x L_S_i
+save SNR30data.mat Y
