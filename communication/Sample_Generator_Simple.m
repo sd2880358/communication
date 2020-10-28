@@ -17,10 +17,10 @@ Len_block = 50; % Number of samples per block
 Num_blocks = 1000;  % Number of blocks observed in dataset
 
 SNR = 30;               % Signal to noise ratio
-INR = 5;                % Interference to noise ratio
+INR = 30;                % Interference to noise ratio
 SINR = SNR/(INR + 1);   % Signal to Interference plus Noise Ratio
 
-p_int = 0.8; %Probability of interference being present in a given block
+p_int = 0.5; %Probability of interference being present in a given block
 
 % QAM Constellations (normalized to average symbol power of 1)
 N_Constellations = 2; % Considering 4QAM and 16QAM
@@ -79,5 +79,5 @@ Y = P_x*X + P_i*I + N;
 
 
 
-save SNR30labels.mat L_Constellations L_Interference L_S_x L_S_i
-save SNR30data.mat Y
+save INRR30labels.mat L_Constellations L_Interference L_S_x L_S_i
+save INR30data.mat Y

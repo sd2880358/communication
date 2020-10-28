@@ -7,8 +7,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 
-dataFile = "./communication/SNR30data.mat"
-labelFile = './communication/SNR30labels.mat'
+dataFile = "./communication/INR30data.mat"
+labelFile = './communication/INR30labels.mat'
 my_data = sc.loadmat(dataFile)
 my_labels = sc.loadmat(labelFile)
 my_data = my_data['Y']
@@ -99,4 +99,4 @@ hist['epoch'] = history.epoch
 hist.tail()
 loss = get_total_loss(y1, test_labels.to_numpy())
 hist = hist.append({'test_loss':loss}, ignore_index=True)
-hist.to_csv('./28/30SNR.csv', index=False)
+hist.to_csv('./28/30INR.csv', index=False)
