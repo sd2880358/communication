@@ -136,7 +136,7 @@ INR30with90Table = dataset(INR30with90data, INR30with90labels)
 test = [myTable, INR30Table, INR30with90Table]
 name = [my_data, INR30data, INR30with90data]
 
-for i in len(test):
+for i in range(len(test)):
     j = i + 1
     while (j<len(test)):
         newTable = pd.concat([test[i],test[j]], ignore_index=True)
