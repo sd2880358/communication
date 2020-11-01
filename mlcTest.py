@@ -155,6 +155,6 @@ for i in range(len(test)):
         test_data.pop(j)
         test_result = prediction(model, test_data[0])
         print("Training model \n" + name[i] + name[j] +
-              "test result: \n" +
+              "test result: \n",
               test_result['signal'])
         plot_loss()
