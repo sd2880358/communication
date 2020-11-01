@@ -155,7 +155,6 @@ for i in range(len(test)):
     model = get_training(newTable, 10, name[i])
     test_data = test.copy()
     test_data.pop(i)
-    test_data_set = pd.DataFrame([test_data[0]])
     test_result = prediction(model, test_data_set, result, name[i])
 
 result = pd.DataFrame(result)
