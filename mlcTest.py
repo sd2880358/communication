@@ -147,7 +147,10 @@ noise30Table = dataset(noise30data, noise30label)
 test = [myTable, INR30Table, INR30with90Table, noise30Table]
 name = [my_data, INR30data, INR30with90data, noise30data]
 result = {}
+total_table = pd.concat([test], ignore_index=True)
+get_training(total_table, 10, "total_test")
 
+'''
 for i in range(len(test)):
     train_set = test.copy()
     test_data_set = train_set.pop(i)
@@ -159,3 +162,4 @@ for i in range(len(test)):
 
 result = pd.DataFrame(result)
 result.to_csv('./results/test.csv', index=False)
+'''
