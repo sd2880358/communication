@@ -103,6 +103,7 @@ def get_training(myTable, epochs, files):
     probability_model = tf.keras.Sequential([dnn_real_model,
                                              tf.keras.layers.Softmax()])
     predictions = probability_model.predict(test_features)
+    plt.clf()
     plot_loss(history)
     plt.savefig('./results/'+files+'png', dpi=300, bbox_inches='tight')
     hist = pd.DataFrame(history.history)
