@@ -147,12 +147,14 @@ result = {}
 
 for i in range(len(test)):
     j = i + 1
-    while (j<len(test)):
+    while (j<=len(test)):
         newTable = pd.concat([test[i],test[j]], ignore_index=True)
-        model = get_training(newTable, 20, name[i]+name[j])
+        model = get_training(newTable, 10, name[i]+name[j])
         test_data = test.copy()
         test_data.pop(j)
         test_data.pop(i)
+
+
         test_result = prediction(model, test_data[0], result, name[i]+name[j])
         j = j + 1
 
