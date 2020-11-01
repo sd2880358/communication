@@ -136,25 +136,27 @@ INR30data = "INR30data"
 INR30labels = "INR30labels"
 INR30with90data = "INR30with90data"
 INR30with90labels = "INR30with90labels"
+noise30data = "noise30data"
+noise30labels = "noise30labels"
 
 myTable = dataset(my_data, my_labels)
 INR30Table = dataset(INR30data, INR30labels)
 INR30with90Table = dataset(INR30with90data, INR30with90labels)
+noise30Table = dataset(noise30data, noise30labels)
 
-test = [myTable, INR30Table, INR30with90Table]
-name = [my_data, INR30data, INR30with90data]
+test = [myTable, INR30Table, INR30with90Table, noise30Table]
+name = [my_data, INR30data, INR30with90data, noise30data]
 result = {}
 
 for i in range(len(test)):
     j = i + 1
-    while (j<=len(test)):
+    while (j<len(test)):
         newTable = pd.concat([test[i],test[j]], ignore_index=True)
         model = get_training(newTable, 10, name[i]+name[j])
         test_data = test.copy()
         test_data.pop(j)
         test_data.pop(i)
-
-
+        test_data_set = pd.concat([test_data[0], test_data[1]], ignore_index=True)
         test_result = prediction(model, test_data[0], result, name[i]+name[j])
         j = j + 1
 

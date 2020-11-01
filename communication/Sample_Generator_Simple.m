@@ -79,5 +79,5 @@ Y = P_x*X + P_i*I + N*30;
 
 
 
-save noise30.mat L_Constellations L_Interference L_S_x L_S_i
-save noise30.mat Y
+save noise30label.mat L_Constellations L_Interference L_S_x L_S_i
+save noise30data.mat Y
