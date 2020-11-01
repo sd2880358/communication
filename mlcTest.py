@@ -150,7 +150,7 @@ result = {}
 
 for i in range(len(test)):
     train_set = test.copy()
-    test_set = train_set.pop(i)
+    test_data_set = train_set.pop(i)
     newTable = pd.concat([train_set[0], train_set[1], train_set[2]], ignore_index=True)
     model = get_training(newTable, 10, name[i])
     test_data = test.copy()
