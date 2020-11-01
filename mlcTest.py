@@ -110,7 +110,7 @@ def get_training(myTable, epochs, files):
     hist['epoch'] = history.epoch
     hist.tail()
     hist = hist.append(test_results, ignore_index=True)
-    hist.to_csv('./results/' + files + '.csv', index=False)
+    hist.to_csv('./result/' + files + '.csv', index=False)
     return dnn_real_model
 
 def plot_loss(history):
@@ -150,7 +150,7 @@ result = {}
 total_table = pd.concat(test, ignore_index=True)
 get_training(total_table, 10, "total_test")
 
-'''
+
 for i in range(len(test)):
     train_set = test.copy()
     test_data_set = train_set.pop(i)
@@ -161,5 +161,4 @@ for i in range(len(test)):
     test_result = prediction(model, test_data_set, result, name[i])
 
 result = pd.DataFrame(result)
-result.to_csv('./results/test.csv', index=False)
-'''
+result.to_csv('./result/test.csv', index=False)
