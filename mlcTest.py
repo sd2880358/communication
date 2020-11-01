@@ -103,19 +103,28 @@ def get_training(myTable, epochs, files):
     probability_model = tf.keras.Sequential([dnn_real_model,
                                              tf.keras.layers.Softmax()])
     predictions = probability_model.predict(test_features)
+    plot_loss(history)
+    plt.savefig('./results/'+files+'png', dpi=300, bbox_inches='tight')
     hist = pd.DataFrame(history.history)
     hist['epoch'] = history.epoch
     hist.tail()
-    loss = get_total_loss(predictions, test_labels.to_numpy())
     hist = hist.append(test_results, ignore_index=True)
     hist.to_csv('./results/' + files + '.csv', index=False)
     return dnn_real_model
+
+def plot_loss(history):
+    plt.plot(history.history['loss'], label='loss')
+    plt.plot(history.history['val_loss'], label='val_loss')
+    plt.ylim([0, 10])
+    plt.xlabel('Epoch')
+    plt.ylabel('Error [Ireal]')
+    plt.legend()
+    plt.grid(True)
 
 
 def prediction(model, testTable):
     test_features = testTable.copy()
     test_labels = pd.DataFrame([test_features.pop('label')]).T
-    predictions = model.predict(test_features)
     test_results = {}
     test_results['signal'] = model.evaluate(
         test_features,
@@ -140,11 +149,12 @@ for i in range(len(test)):
     j = i + 1
     while (j<len(test)):
         newTable = pd.concat([test[i],test[j]], ignore_index=True)
-        model = get_training(newTable, 10, name[i]+name[j])
+        model = get_training(newTable, 20, name[i]+name[j])
         test_data = test.copy()
         test_data.pop(i)
         test_data.pop(j)
         test_result = prediction(model, test_data[0])
         print("Training model \n" + name[i] + name[j] +
               "test result: \n" +
-              test_result)
+              test_result['signal'])
+        plot_loss()
