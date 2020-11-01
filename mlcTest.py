@@ -122,14 +122,12 @@ def plot_loss(history):
     plt.grid(True)
 
 
-def prediction(model, testTable):
+def prediction(model, testTable, test_results, fileNanme):
     test_features = testTable.copy()
     test_labels = pd.DataFrame([test_features.pop('label')]).T
-    test_results = {}
-    test_results['signal'] = model.evaluate(
+    test_results[fileNanme] = model.evaluate(
         test_features,
         test_labels, verbose=0)
-    return test_results
 
 my_data = "my_data"
 my_labels = "my_labels"
@@ -144,6 +142,7 @@ INR30with90Table = dataset(INR30with90data, INR30with90labels)
 
 test = [myTable, INR30Table, INR30with90Table]
 name = [my_data, INR30data, INR30with90data]
+result = {}
 
 for i in range(len(test)):
     j = i + 1
@@ -153,7 +152,8 @@ for i in range(len(test)):
         test_data = test.copy()
         test_data.pop(i)
         test_data.pop(j)
-        test_result = prediction(model, test_data[0])
-        print("Training model \n" + name[i] + name[j] +
-              "test result: \n",
-              test_result['signal'])
+        test_result = prediction(model, test_data[0], result, name[i]+name[j])
+
+with open('./result/test.csv', 'w') as f:
+    for key in result.keys():
+        f.write("%s,%s\n"%(key, result[key]))
