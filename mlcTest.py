@@ -156,6 +156,5 @@ for i in range(len(test)):
         test_result = prediction(model, test_data[0], result, name[i]+name[j])
         j = j + 1
 
-with open('./result/test.csv', 'wb') as f:
-    for key in result.keys():
-        f.write("%s,%s\n"%(key, result[key]))
+result = pd.DataFrame(result)
+result.to_csv('./results/test.csv', index=False)
