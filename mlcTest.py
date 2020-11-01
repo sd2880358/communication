@@ -157,4 +157,3 @@ for i in range(len(test)):
         print("Training model \n" + name[i] + name[j] +
               "test result: \n",
               test_result['signal'])
-        plot_loss()
