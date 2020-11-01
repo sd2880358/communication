@@ -137,12 +137,12 @@ INR30labels = "INR30labels"
 INR30with90data = "INR30with90data"
 INR30with90labels = "INR30with90labels"
 noise30data = "noise30data"
-noise30labels = "noise30labels"
+noise30label = "noise30label"
 
 myTable = dataset(my_data, my_labels)
 INR30Table = dataset(INR30data, INR30labels)
 INR30with90Table = dataset(INR30with90data, INR30with90labels)
-noise30Table = dataset(noise30data, noise30labels)
+noise30Table = dataset(noise30data, noise30label)
 
 test = [myTable, INR30Table, INR30with90Table, noise30Table]
 name = [my_data, INR30data, INR30with90data, noise30data]
