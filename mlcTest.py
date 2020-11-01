@@ -148,14 +148,14 @@ test = [myTable, INR30Table, INR30with90Table, noise30Table]
 name = [my_data, INR30data, INR30with90data, noise30data]
 result = {}
 total_table = pd.concat(test, ignore_index=True)
-get_training(total_table, 10, "total_test")
+get_training(total_table, 100, "total_test")
 
 
 for i in range(len(test)):
     train_set = test.copy()
     test_data_set = train_set.pop(i)
     newTable = pd.concat([train_set[0], train_set[1], train_set[2]], ignore_index=True)
-    model = get_training(newTable, 10, name[i])
+    model = get_training(newTable, 100, name[i])
     test_data = test.copy()
     test_data.pop(i)
     test_result = prediction(model, test_data_set, result, name[i])
