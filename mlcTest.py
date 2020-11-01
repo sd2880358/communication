@@ -154,6 +154,7 @@ for i in range(len(test)):
         test_data.pop(i)
         test_data.pop(j)
         test_result = prediction(model, test_data[0], result, name[i]+name[j])
+        j = j + 1
 
 with open('./result/test.csv', 'w') as f:
     for key in result.keys():
