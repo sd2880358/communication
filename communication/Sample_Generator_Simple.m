@@ -16,11 +16,11 @@ VISUALIZE = 1; % Set to 1 to show received constellations
 Len_block = 50; % Number of samples per block
 Num_blocks = 1000;  % Number of blocks observed in dataset
 
-SNR = 30;               % Signal to noise ratio
-INR = 30;                % Interference to noise ratio
+SNR = 60;               % Signal to noise ratio
+INR = 5;                % Interference to noise ratio
 SINR = SNR/(INR + 1);   % Signal to Interference plus Noise Ratio
 
-p_int = 0.5; %Probability of interference being present in a given block
+p_int = 0.8; %Probability of interference being present in a given block
 
 % QAM Constellations (normalized to average symbol power of 1)
 N_Constellations = 2; % Considering 4QAM and 16QAM

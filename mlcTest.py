@@ -149,16 +149,14 @@ name = [my_data, INR30data, INR30with90data, noise30data]
 result = {}
 
 for i in range(len(test)):
-    j = i + 1
-    while (j<len(test)):
-        newTable = pd.concat([test[i],test[j]], ignore_index=True)
-        model = get_training(newTable, 10, name[i]+name[j])
-        test_data = test.copy()
-        test_data.pop(j)
-        test_data.pop(i)
-        test_data_set = pd.concat([test_data[0], test_data[1]], ignore_index=True)
-        test_result = prediction(model, test_data[0], result, name[i]+name[j])
-        j = j + 1
+    train_set = test.copy()
+    test_set = train_set.pop(i)
+    newTable = pd.concat([train_set[0], train_set[1], train_set[2]], ignore_index=True)
+    model = get_training(newTable, 10, name[i]+name[j])
+    test_data = test.copy()
+    test_data.pop(i)
+    test_data_set = pd.DataFrame([test_data[0]])
+    test_result = prediction(model, test_data_set, result, name[i])
 
 result = pd.DataFrame(result)
 result.to_csv('./results/test.csv', index=False)
