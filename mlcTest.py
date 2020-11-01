@@ -62,6 +62,7 @@ def build_and_compile_model(norm):
         norm,
         layers.Dense(50, activation='relu'),
         layers.Dense(50, activation='relu'),
+        layers.Dense(50, activation='relu'),
         layers.Dense(20)
     ])
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -105,12 +106,12 @@ def get_training(myTable, epochs, files):
     predictions = probability_model.predict(test_features)
     plt.clf()
     plot_loss(history)
-    plt.savefig('./results/'+files+'png', dpi=300, bbox_inches='tight')
+    plt.savefig('./result2/'+files+'png', dpi=300, bbox_inches='tight')
     hist = pd.DataFrame(history.history)
     hist['epoch'] = history.epoch
     hist.tail()
     hist = hist.append(test_results, ignore_index=True)
-    hist.to_csv('./result/' + files + '.csv', index=False)
+    hist.to_csv('./result2/' + files + '.csv', index=False)
     return dnn_real_model
 
 def plot_loss(history):
@@ -148,17 +149,17 @@ test = [myTable, INR30Table, INR30with90Table, noise30Table]
 name = [my_data, INR30data, INR30with90data, noise30data]
 result = {}
 total_table = pd.concat(test, ignore_index=True)
-get_training(total_table, 100, "total_test")
+get_training(total_table, 10, "total_test")
 
 
 for i in range(len(test)):
     train_set = test.copy()
     test_data_set = train_set.pop(i)
     newTable = pd.concat([train_set[0], train_set[1], train_set[2]], ignore_index=True)
-    model = get_training(newTable, 100, name[i])
+    model = get_training(newTable, 10, name[i])
     test_data = test.copy()
     test_data.pop(i)
     test_result = prediction(model, test_data_set, result, name[i])
 
 result = pd.DataFrame(result)
-result.to_csv('./result/test.csv', index=False)
+result.to_csv('./result2/test.csv', index=False)
