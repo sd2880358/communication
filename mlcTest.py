@@ -3,9 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io as sc
 import pandas as pd
+import seaborn as sns
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
+
 
 
 def dataset(dataFile, labelFile):
@@ -51,6 +53,11 @@ def training_set(myTable):
     training_dataset = myTable[myTable.block.isin(numbers)]
     return training_dataset
 
+def get_results(results):
+    prediction_results = []
+    for i in range(results):
+        prediction_results.append(np.argmax(results[0][i]))
+    return prediction_results
 
 def test_set(myTable, training_dataset):
     remaining = myTable.drop(training_dataset.index)
@@ -104,9 +111,16 @@ def get_training(myTable, epochs, files):
     probability_model = tf.keras.Sequential([dnn_real_model,
                                              tf.keras.layers.Softmax()])
     predictions = probability_model.predict(test_features)
-    plt.clf()
-    plot_loss(history)
-    plt.savefig('./result2/'+files+'png', dpi=300, bbox_inches='tight')
+    prediction_results = get_results(predictions)
+    prediction_norm = tf.keras.utils.normalize(
+    prediction_results, axis=-1, order=2
+    )
+    figure = plt.figure(figsize=(20, 20))
+    sns.heatmap(prediction_norm, annot=True, cmap=plt.cm.Blues)
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.savefig('./result3/'+files, dpi=300, bbox_inches='tight')
     hist = pd.DataFrame(history.history)
     hist['epoch'] = history.epoch
     hist.tail()
