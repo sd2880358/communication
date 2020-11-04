@@ -71,6 +71,7 @@ def build_and_compile_model(norm):
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
+        layers.Dense(128, activation='relu'),
         layers.Dense(20)
     ])
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -174,7 +175,7 @@ table3 = dataset(data3, data3_label)
 
 test = [table1, table2, table3]
 name = [data1, data2, data3]
-time = "test3"
+time = "test4"
 
 for i in range(len(test)):
     test_results = get_training(test[i], 10, name[i], time)
