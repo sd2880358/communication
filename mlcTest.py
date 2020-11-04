@@ -175,6 +175,6 @@ table3 = dataset(data3, data3_label)
 test = [table1, table2, table3]
 name = [data1, data2, data3]
 
-for i in range(1):
+for i in range(len(test)):
     test_results = get_training(test[i], 10, name[i], "test1")
     divide_Result(test_results, name[i], "test1")
