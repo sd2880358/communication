@@ -177,5 +177,5 @@ name = [data1, data2, data3]
 time = "test2"
 
 for i in range(len(test)):
-    test_results = get_training(test[i], 10, name[i], )
+    test_results = get_training(test[i], 10, name[i], time)
     divide_Result(test_results, name[i], time)
