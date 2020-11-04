@@ -75,9 +75,9 @@ N = sqrt(0.5)*P_n*(randn(Len_block,Num_blocks) + 1i*randn(Len_block,Num_blocks))
 
 
 %% Generate received signal
-Y = P_x*X + P_i*I + N;
+Y = P_x*X + P_i*I + N*30;
 
 
 
-save data1.mat L_Constellations L_Interference L_S_x L_S_i
-save data1_label.mat Y
+save data3_label.mat L_Constellations L_Interference L_S_x L_S_i
+save data3.mat Y
