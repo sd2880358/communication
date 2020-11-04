@@ -10,6 +10,7 @@ from tensorflow.keras.layers.experimental import preprocessing
 
 
 
+
 def dataset(dataFile, labelFile):
     dataFile = "./communication/" + dataFile
     labelFile = "./communication/" + labelFile
@@ -55,8 +56,8 @@ def training_set(myTable):
 
 def get_results(results):
     prediction_results = []
-    for i in range(results):
-        prediction_results.append(np.argmax(results[0][i]))
+    for i in range(len(results)):
+        prediction_results.append(np.argmax(results[i]))
     return prediction_results
 
 def test_set(myTable, training_dataset):
@@ -67,9 +68,9 @@ def test_set(myTable, training_dataset):
 def build_and_compile_model(norm):
     model = keras.Sequential([
         norm,
-        layers.Dense(50, activation='relu'),
-        layers.Dense(50, activation='relu'),
-        layers.Dense(50, activation='relu'),
+        layers.Dense(100, activation='relu'),
+        layers.Dense(100, activation='relu'),
+        layers.Dense(100, activation='relu'),
         layers.Dense(20)
     ])
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -77,18 +78,18 @@ def build_and_compile_model(norm):
                   metrics=['accuracy'])
     return model
 
-
+'''
 def get_total_loss(predict_label, true_label):
     i = 0
     for j in range(len(predict_label)):
         prediction = np.argmax(predict_label[j])
         if prediction != true_label[j]:
-            i = i + 1
+            i = i + test1
     return i / len(predict_label)
+'''
 
 
-
-def get_training(myTable, epochs, files):
+def get_training(myTable, epochs, files, test_time):
     train_dataset = training_set(myTable)
     test_dataset = test_set(myTable, train_dataset)
     train_features = train_dataset.copy()
@@ -101,7 +102,7 @@ def get_training(myTable, epochs, files):
     history = dnn_real_model.fit(
         train_features, train_labels,
         validation_split=0.2,
-        epochs=epochs)
+        epochs=epochs, verbose=0)
     hist = pd.DataFrame(history.history)
     hist['epoch'] = history.epoch
     test_results = {}
@@ -111,23 +112,21 @@ def get_training(myTable, epochs, files):
     probability_model = tf.keras.Sequential([dnn_real_model,
                                              tf.keras.layers.Softmax()])
     predictions = probability_model.predict(test_features)
-    prediction_results = get_results(predictions)
-    prediction_norm = tf.keras.utils.normalize(
-    prediction_results, axis=-1, order=2
-    )
-    figure = plt.figure(figsize=(20, 20))
-    sns.heatmap(prediction_norm, annot=True, cmap=plt.cm.Blues)
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.savefig('./result3/'+files, dpi=300, bbox_inches='tight')
-    hist = pd.DataFrame(history.history)
+    predicted_results = get_results(predictions)
+    cf = tf.math.confusion_matrix(predicted_results, test_labels.to_numpy()).numpy()
+    cf = pd.DataFrame(cf)
     hist['epoch'] = history.epoch
     hist.tail()
     hist = hist.append(test_results, ignore_index=True)
-    hist.to_csv('./result2/' + files + '.csv', index=False)
-    return dnn_real_model
+    hist.to_csv('./result/'+ test_time + '/' + files + '.csv', index=False)
+    return cf
 
+def plot_heatmap(ax, symbol_error, cons_error):
+    df = sns.heatmap(symbol_error, annot=True,cmap=plt.cm.Blues, ax=ax)
+    df.xaxis.tick_top()
+    df.set_xlabel(['P(cons error)= {:.2f}'.format(cons_error)])
+
+'''
 def plot_loss(history):
     plt.plot(history.history['loss'], label='loss')
     plt.plot(history.history['val_loss'], label='val_loss')
@@ -136,7 +135,7 @@ def plot_loss(history):
     plt.ylabel('Error [Ireal]')
     plt.legend()
     plt.grid(True)
-
+'''
 
 def prediction(model, testTable, test_results, fileNanme):
     test_features = testTable.copy()
@@ -144,6 +143,23 @@ def prediction(model, testTable, test_results, fileNanme):
     test_results[fileNanme] = model.evaluate(
         test_features,
         test_labels, verbose=0)
+
+def divide_Result(cf, file_name, test_time):
+    cons_4 = cf[:4]
+    cons_16 = cf[4:]
+    cons_4_error = (cons_4.iloc[:, 4:].sum().sum()) / cons_4.sum().sum()
+    cons_16_error = (cons_16.iloc[:, :4].sum().sum()) / cons_4.sum().sum()
+    symbol_error_results_4 = np.array([1 - cons_4.iloc[i, i] /
+                                       cons_4.iloc[i, :].sum() for i in range(4)]).reshape(2, 2)
+    symbol_error_results_16 = np.array(
+        [1 - cons_16.iloc[i - 4, i] /
+         cons_16.iloc[i - 4, :].sum() for i in range(4, 20)]).reshape(4, 4)
+    symbol_error_results_4 = pd.DataFrame(symbol_error_results_4)
+    symbol_error_results_16 = pd.DataFrame(symbol_error_results_16)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    plot_heatmap(ax1, symbol_error_results_4, cons_4_error)
+    plot_heatmap(ax2, symbol_error_results_16, cons_16_error)
+    plt.savefig("./result/"+ test_time+'/'+file_name, dpi=500)
 
 my_data = "my_data"
 my_labels = "my_labels"
@@ -161,19 +177,7 @@ noise30Table = dataset(noise30data, noise30label)
 
 test = [myTable, INR30Table, INR30with90Table, noise30Table]
 name = [my_data, INR30data, INR30with90data, noise30data]
-result = {}
-total_table = pd.concat(test, ignore_index=True)
-get_training(total_table, 10, "total_test")
 
-
-for i in range(len(test)):
-    train_set = test.copy()
-    test_data_set = train_set.pop(i)
-    newTable = pd.concat([train_set[0], train_set[1], train_set[2]], ignore_index=True)
-    model = get_training(newTable, 10, name[i])
-    test_data = test.copy()
-    test_data.pop(i)
-    test_result = prediction(model, test_data_set, result, name[i])
-
-result = pd.DataFrame(result)
-result.to_csv('./result2/test.csv', index=False)
+for i in range(1):
+    test_results = get_training(test[i], 10, name[i], "test1")
+    divide_Result(test_results, name[i], "test1")
