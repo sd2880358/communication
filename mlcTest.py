@@ -68,9 +68,9 @@ def test_set(myTable, training_dataset):
 def build_and_compile_model(norm):
     model = keras.Sequential([
         norm,
-        layers.Dense(100, activation='relu'),
-        layers.Dense(100, activation='relu'),
-        layers.Dense(100, activation='relu'),
+        layers.Dense(128, activation='relu'),
+        layers.Dense(128, activation='relu'),
+        layers.Dense(128, activation='relu'),
         layers.Dense(20)
     ])
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
