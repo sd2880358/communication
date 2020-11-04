@@ -161,22 +161,19 @@ def divide_Result(cf, file_name, test_time):
     plot_heatmap(ax2, symbol_error_results_16, cons_16_error)
     plt.savefig("./result/"+ test_time+'/'+file_name, dpi=500)
 
-my_data = "my_data"
-my_labels = "my_labels"
-INR30data = "INR30data"
-INR30labels = "INR30labels"
-INR30with90data = "INR30with90data"
-INR30with90labels = "INR30with90labels"
-noise30data = "noise30data"
-noise30label = "noise30label"
+data1 = "data1"
+data1_label = "data1_label"
+data2 = "data2"
+data2_label = "data2_label"
+data3 = "data3"
+data3_label = "data3_label"
 
-myTable = dataset(my_data, my_labels)
-INR30Table = dataset(INR30data, INR30labels)
-INR30with90Table = dataset(INR30with90data, INR30with90labels)
-noise30Table = dataset(noise30data, noise30label)
+table1 = dataset(data1, data1_label)
+table2 = dataset(data2, data2_label)
+table3 = dataset(data3, data3_label)
 
-test = [myTable, INR30Table, INR30with90Table, noise30Table]
-name = [my_data, INR30data, INR30with90data, noise30data]
+test = [table1, table2, table3]
+name = [data1, data2, data3]
 
 for i in range(1):
     test_results = get_training(test[i], 10, name[i], "test1")
