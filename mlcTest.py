@@ -174,7 +174,7 @@ table3 = dataset(data3, data3_label)
 
 test = [table1, table2, table3]
 name = [data1, data2, data3]
-time = "test2"
+time = "test3"
 
 for i in range(len(test)):
     test_results = get_training(test[i], 10, name[i], time)
