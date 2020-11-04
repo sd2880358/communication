@@ -76,7 +76,7 @@ def build_and_compile_model(norm):
         layers.Dense(20)
     ])
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  optimizer=tf.keras.optimizers.Adam(0.01),
+                  optimizer=tf.keras.optimizers.Adam(0.1),
                   metrics=['accuracy'])
     return model
 

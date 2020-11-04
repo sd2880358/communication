@@ -1,7 +1,6 @@
 #Model 1
-5 Hidden layer with 128 nodes, 
-learning rate = 0.01
-
+Hidden layer with 128 nodes, 
+learning rate = 0.1
 
 ## Sample size (50*1000)
 -- Data Set 1: SNR = 60, INR = 5, p_int = 0.8, N=1;
