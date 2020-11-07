@@ -167,8 +167,8 @@ def divide_Result(cf, file_name, test_time):
 
 data1 = "intermediate"
 data1_label = "intermediate_label"
-data2 = "data2"
-data2_label = "data2_label"
+data2 = "hard"
+data2_label = "hard_label"
 data3 = "data3"
 data3_label = "data3_label"
 
@@ -177,7 +177,7 @@ table2 = dataset(data2, data2_label)
 test = pd.DataFrame()
 accuracy = pd.DataFrame()
 
-file_diretory = "converge_test"
+file_diretory = "converge_test_hard"
 for i in range(0,50):
     cf, result2 = get_training(table1, 20, file_diretory, data1)
     array = []
@@ -195,7 +195,7 @@ for i in range(0,50):
     test = test.append(array)
     accuracy = accuracy.append(result2)
     print("This is the {} time".format(i))
-test.to_csv('./result/converge_test/error_rate.csv', index=False)
-accuracy.to_csv('./result/converge_test/accuracy.csv', index=False)
+test.to_csv('./result/converge_test_hard/error_rate.csv', index=False)
+accuracy.to_csv('./result/converge_test_hard/accuracy.csv', index=False)
 
 
