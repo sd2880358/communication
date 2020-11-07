@@ -118,10 +118,10 @@ def get_training(myTable, epochs, files, test_time):
     cf = tf.math.confusion_matrix(predicted_results, test_labels.to_numpy()).numpy()
     cf = pd.DataFrame(cf)
     hist['epoch'] = history.epoch
-    hist.tail()
-    hist = hist.append(test_results, ignore_index=True)
-    hist.to_csv('./result/'+ test_time + '/' + files + '.csv', index=False)
-    return cf
+    result1 = hist.tail()
+    result1 = result1.append(test_results, ignore_index=True)
+    "hist.to_csv('./result/'+ test_time + '/' + files + '.csv', index=False)"
+    return [cf, test_results]
 
 def plot_heatmap(ax, symbol_error, cons_error):
     df = sns.heatmap(symbol_error, annot=True,cmap=plt.cm.Blues, ax=ax)
@@ -158,13 +158,15 @@ def divide_Result(cf, file_name, test_time):
          cons_16.iloc[i - 4, :].sum() for i in range(4, 20)]).reshape(4, 4)
     symbol_error_results_4 = pd.DataFrame(symbol_error_results_4)
     symbol_error_results_16 = pd.DataFrame(symbol_error_results_16)
+    '''
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     plot_heatmap(ax1, symbol_error_results_4, cons_4_error)
     plot_heatmap(ax2, symbol_error_results_16, cons_16_error)
     plt.savefig("./result/"+ test_time+'/'+file_name, dpi=500)
+    '''
 
-data1 = "data1"
-data1_label = "data1_label"
+data1 = "intermediate"
+data1_label = "intermediate_label"
 data2 = "data2"
 data2_label = "data2_label"
 data3 = "data3"
@@ -172,14 +174,27 @@ data3_label = "data3_label"
 
 table1 = dataset(data1, data1_label)
 table2 = dataset(data2, data2_label)
-table3 = dataset(data3, data3_label)
+test = pd.DataFrame()
+accuracy = pd.DataFrame()
 
-test = [table1, table2, table3]
-name = [data1, data2, data3]
-time = "test_2"
-for i in range(0,10):
-    i = str(i)
-    for j in range(len(test)):
-        test_results = get_training(test[j], 10, name[j]+i, time)
-        divide_Result(test_results, name[j]+i, time)
-    print("this is the {} time;".format(i))
+file_diretory = "converge_test"
+for i in range(0,50):
+    cf, result2 = get_training(table1, 20, file_diretory, data1)
+    array = []
+    cons_4 = cf[:4]
+    cons_16 = cf[4:]
+    for j in range(len(cf)):
+        result = cf.iloc[j, j] / cf.iloc[j, :].sum()
+        array.append(result)
+    cons_4_error = (cons_4.iloc[:, 4:].sum().sum()) / cons_4.sum().sum()
+    cons_16_error = (cons_16.iloc[:, :4].sum().sum()) / cons_4.sum().sum()
+    array.append(cons_4_error)
+    array.append(cons_16_error)
+    array = pd.DataFrame(array).T
+    result2 = pd.DataFrame(result2).T
+    test = test.append(array)
+    accuracy = accuracy.append(result2)
+test.to_csv('./result/converge_test/error_rate.csv', index=False)
+accuracy.to_csv('./result/converge_test/accuracy.csv', index=False)
+
+
