@@ -176,7 +176,7 @@ table3 = dataset(data3, data3_label)
 
 test = [table1, table2, table3]
 name = [data1, data2, data3]
-time = "test_2/"
+time = "test_2"
 for i in range(0,10):
     i = str(i)
     for j in range(len(test)):
