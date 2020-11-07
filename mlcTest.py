@@ -194,6 +194,7 @@ for i in range(0,50):
     result2 = pd.DataFrame(result2).T
     test = test.append(array)
     accuracy = accuracy.append(result2)
+    print("This is the {} time".format(i))
 test.to_csv('./result/converge_test/error_rate.csv', index=False)
 accuracy.to_csv('./result/converge_test/accuracy.csv', index=False)
 
