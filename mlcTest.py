@@ -7,6 +7,7 @@ import pandas as pd
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
+import os
 
 
 
@@ -225,12 +226,18 @@ file_directory = './result/cross_testing'
 
 for i in range(0,10):
     i = str(i+1)
-    test1_ori, test1_cross, test1_accuracy = cross_test(table1, table2, test1_accuracy)
-    test2_ori, test2_cross, test2_accuracy = cross_test(table2, table1, test2_accuracy)
+    test1_ori, test1_cross, test1_accuracy = cross_test(table1, table2,
+                                                        test1_ori, test1_cross,
+                                                        test1_accuracy)
+    test2_ori, test2_cross, test2_accuracy = cross_test(table2, table1,
+                                                        test2_ori, test1_cross,
+                                                        test2_accuracy)
     print("This is the {} time".format(i))
 
 
 
+if not os.path.exists(file_directory):
+    os.makedirs(file_directory)
 test1_ori.to_csv(file_directory +'/test1_ori_error_rate.csv', index=False)
 test1_cross.to_csv(file_directory +'/test1_cross_error_rate.csv', index=False)
 test2_ori.to_csv(file_directory + '/test2_ori_error_rate.csv', index=False)
