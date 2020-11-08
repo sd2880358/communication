@@ -1,9 +1,9 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.io as sc
+'import scipy.io as sc'
 import pandas as pd
-import seaborn as sns
+'import seaborn as sns'
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
@@ -169,8 +169,8 @@ data1 = "intermediate"
 data1_label = "intermediate_label"
 data2 = "hard"
 data2_label = "hard_label"
-data3 = "data"
-data3_label = "data_label"
+data3 = "data_label"
+data3_label = "data"
 
 table1 = dataset(data1, data1_label)
 table2 = dataset(data2, data2_label)
