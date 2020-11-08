@@ -14,7 +14,7 @@ VISUALIZE = 1; % Set to 1 to show received constellations
 
 %% Simulation Parameters
 Len_block = 50; % Number of samples per block
-Num_blocks = 10000;  % Number of blocks observed in dataset
+Num_blocks = 1000;  % Number of blocks observed in dataset
 
 SNR = 60;               % Signal to noise ratio
 INR = 5;                % Interference to noise ratio
@@ -79,5 +79,5 @@ Y = P_x*X + P_i*I + N*30;
 
 
 
-save data_label10.mat L_Constellations L_Interference L_S_x L_S_i
-save data10.mat Y
+save intermediate_label.mat L_Constellations L_Interference L_S_x L_S_i
+save intermediate.mat Y

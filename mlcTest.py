@@ -91,7 +91,7 @@ def get_total_loss(predict_label, true_label):
 '''
 
 
-def get_training(myTable, epochs, files, test_time):
+def get_training(myTable, epochs, cross_data):
     train_dataset = training_set(myTable)
     test_dataset = test_set(myTable, train_dataset)
     train_features = train_dataset.copy()
@@ -113,15 +113,29 @@ def get_training(myTable, epochs, files, test_time):
         test_labels, verbose=0)
     probability_model = tf.keras.Sequential([dnn_real_model,
                                              tf.keras.layers.Softmax()])
-    predictions = probability_model.predict(test_features)
-    predicted_results = get_results(predictions)
-    cf = tf.math.confusion_matrix(predicted_results, test_labels.to_numpy()).numpy()
-    cf = pd.DataFrame(cf)
+
+    cf_ori = confusion_matrix(probability_model, test_features, test_labels)
+    cross_features = cross_data.copy()
+    cross_label  = pd.DataFrame([cross_features.pop('label')]).T
+    cf_cross = confusion_matrix(probability_model, cross_features, cross_label)
+    test_results['cross'] = dnn_real_model.evaluate(
+        cross_features,
+        cross_label, verbose=0
+    )
+    '''
     hist['epoch'] = history.epoch
     result1 = hist.tail()
     result1 = result1.append(test_results, ignore_index=True)
-    "hist.to_csv('./result/'+ test_time + '/' + files + '.csv', index=False)"
-    return [cf, test_results]
+    hist.to_csv('./result/'+ test_time + '/' + files + '.csv', index=False)
+    '''
+    return [cf_ori, cf_cross, test_results]
+
+def confusion_matrix(model, feature, label):
+    expected = model.predict(feature)
+    expected = get_results(expected)
+    cf = tf.math.confusion_matrix(expected, label.to_numpy()).numpy()
+    return cf
+
 
 def plot_heatmap(ax, symbol_error, cons_error):
     df = sns.heatmap(symbol_error, annot=True,cmap=plt.cm.Blues, ax=ax)
@@ -164,26 +178,7 @@ def divide_Result(cf, file_name, test_time):
     plot_heatmap(ax2, symbol_error_results_16, cons_16_error)
     plt.savefig("./result/"+ test_time+'/'+file_name, dpi=500)
     '''
-
-data1 = "intermediate"
-data1_label = "intermediate_label"
-data2 = "hard"
-data2_label = "hard_label"
-data3 = "data"
-data3_label = "data_label"
-
-table1 = dataset(data1, data1_label)
-table2 = dataset(data2, data2_label)
-test = pd.DataFrame()
-accuracy = pd.DataFrame()
-
-file_diretory = "converge_test_hard"
-for i in range(0,10):
-    i = str(i+1)
-    data = data3 + i
-    data_label = data3_label + i
-    table = dataset(data, data_label)
-    cf, result2 = get_training(table, 20, file_diretory, data1)
+def batch_result(cf):
     array = []
     cons_4 = cf[:4]
     cons_16 = cf[4:]
@@ -195,11 +190,51 @@ for i in range(0,10):
     array.append(cons_4_error)
     array.append(cons_16_error)
     array = pd.DataFrame(array).T
-    result2 = pd.DataFrame(result2).T
-    test = test.append(array)
-    accuracy = accuracy.append(result2)
-    print("This is the {} time".format(i))
-test.to_csv('./result/sample_size/error_rate.csv', index=False)
-accuracy.to_csv('./result/sample_size/accuracy.csv', index=False)
+    return array
 
+def cross_test(train_set, test_set, ori, cross, test_result):
+    test_dataset = test_set.sample(frac=0.2, random_state=0)
+    cf_ori, cf_cross, result = get_training(train_set, 20, test_dataset)
+    cf_ori_array = batch_result(cf_ori)
+    cf_cross_array = batch_result(cf_cross)
+    result = pd.DataFrame(result).T
+    ori = ori.append(cf_ori_array)
+    cross = cross.append(cf_cross_array)
+    test_result = test_result.append(result)
+    return [ori, cross, test_result]
+
+
+
+data1 = "intermediate"
+data1_label = "intermediate_label"
+data2 = "hard"
+data2_label = "hard_label"
+data3 = "data"
+data3_label = "data_label"
+
+table1 = dataset(data1, data1_label)
+table2 = dataset(data2, data2_label)
+test1_ori = pd.DataFrame()
+test2_ori = pd.DataFrame()
+test1_cross = pd.DataFrame()
+test2_cross = pd.DataFrame()
+test1_accuracy = pd.DataFrame()
+test2_accuracy =  pd.DataFrame()
+file_directory = './result/cross_testing'
+
+
+for i in range(0,10):
+    i = str(i+1)
+    test1_ori, test1_cross, test1_accuracy = cross_test(table1, table2, test1_accuracy)
+    test2_ori, test2_cross, test2_accuracy = cross_test(table2, table1, test2_accuracy)
+    print("This is the {} time".format(i))
+
+
+
+test1_ori.to_csv(file_directory +'/test1_ori_error_rate.csv', index=False)
+test1_cross.to_csv(file_directory +'/test1_cross_error_rate.csv', index=False)
+test2_ori.to_csv(file_directory + '/test2_ori_error_rate.csv', index=False)
+test2_cross.to_csv(file_directory + '/test2_cross_error_rate.csv', index=False)
+test1_accuracy.to_csv(file_directory + '/test1_accuracy.csv', index=False)
+test2_accuracy.to_csv(file_directory + '/test1_accuracy.csv', index=False)
 
