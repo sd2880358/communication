@@ -16,7 +16,7 @@ VISUALIZE = 1; % Set to 1 to show received constellations
 Len_block = 50; % Number of samples per block
 Num_blocks = 1000;  % Number of blocks observed in dataset
 
-SNR = 60;               % Signal to noise ratio
+SNR = 30;               % Signal to noise ratio
 INR = 30;                % Interference to noise ratio
 SINR = SNR/(INR + 1);   % Signal to Interference plus Noise Ratio
 

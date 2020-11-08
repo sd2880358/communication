@@ -5,7 +5,7 @@
 - Sample Size: (50*1,000)
 
 - Intermediate: 
- `SNR*60, INR*30, P_INT*0.8, N`
+ `SNR*30, INR*30, P_INT*0.8, N`
 - hard :
  `SNR*60, INR*5, P_INT*0.8, N*30`
  
