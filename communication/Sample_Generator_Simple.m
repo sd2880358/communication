@@ -79,5 +79,5 @@ Y = P_x*X + P_i*I + N*30;
 
 
 
-save hard_label.mat L_Constellations L_Interference L_S_x L_S_i
-save hard.mat Y
+save data_label10.mat L_Constellations L_Interference L_S_x L_S_i
+save data10.mat Y
