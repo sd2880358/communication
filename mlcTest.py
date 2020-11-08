@@ -244,5 +244,5 @@ test1_cross.to_csv(file_directory +'/test1_cross_error_rate.csv', index=False)
 test2_ori.to_csv(file_directory + '/test2_ori_error_rate.csv', index=False)
 test2_cross.to_csv(file_directory + '/test2_cross_error_rate.csv', index=False)
 test1_accuracy.to_csv(file_directory + '/test1_accuracy.csv', index=False)
-test2_accuracy.to_csv(file_directory + '/test1_accuracy.csv', index=False)
+test2_accuracy.to_csv(file_directory + '/test2_accuracy.csv', index=False)
 
