@@ -75,7 +75,7 @@ N = sqrt(0.5)*P_n*(randn(Len_block,Num_blocks) + 1i*randn(Len_block,Num_blocks))
 
 
 %% Generate received signal
-Y = P_x*X + P_i*I + N*30;
+Y = P_x*X + P_i*I + N;
 
 
 
