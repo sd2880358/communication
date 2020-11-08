@@ -135,6 +135,7 @@ def confusion_matrix(model, feature, label):
     expected = model.predict(feature)
     expected = get_results(expected)
     cf = tf.math.confusion_matrix(expected, label.to_numpy()).numpy()
+    cf = pd.DataFrame(cf)
     return cf
 
 
