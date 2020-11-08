@@ -185,10 +185,10 @@ def batch_result(cf):
     cons_4 = cf[:4]
     cons_16 = cf[4:]
     for j in range(len(cf)):
-        result = cf.iloc[j, j] / cf.iloc[j, :].sum()
+        result = 1 - cf.iloc[j, j] / cf.iloc[j, :].sum()
         array.append(result)
     cons_4_error = (cons_4.iloc[:, 4:].sum().sum()) / cons_4.sum().sum()
-    cons_16_error = (cons_16.iloc[:, :4].sum().sum()) / cons_4.sum().sum()
+    cons_16_error = (cons_16.iloc[:, :4].sum().sum()) / cons_16.sum().sum()
     array.append(cons_4_error)
     array.append(cons_16_error)
     array = pd.DataFrame(array).T
@@ -202,7 +202,8 @@ def cross_test(train_set, test_set, ori, cross, test_result):
     result = pd.DataFrame(result).T
     ori = ori.append(cf_ori_array)
     cross = cross.append(cf_cross_array)
-    test_result = test_result.append(result)
+    test_result["ori"] = test_result["ori"].append(result["signal"])
+    test_result["cross"] = test_result["cross"].append(result["cross"])
     return [ori, cross, test_result]
 
 
