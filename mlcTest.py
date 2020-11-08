@@ -202,8 +202,7 @@ def cross_test(train_set, test_set, ori, cross, test_result):
     result = pd.DataFrame(result).T
     ori = ori.append(cf_ori_array)
     cross = cross.append(cf_cross_array)
-    test_result["ori"] = test_result["ori"].append(result["signal"])
-    test_result["cross"] = test_result["cross"].append(result["cross"])
+    test_result = test_result.append(result)
     return [ori, cross, test_result]
 
 
