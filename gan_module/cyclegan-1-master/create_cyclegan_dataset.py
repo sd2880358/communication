@@ -5,7 +5,7 @@ import random
 
 import click
 
-from . import cyclegan_datasets
+import cyclegan_datasets
 
 
 def create_list(foldername, fulldir=True, suffix=".jpg"):
