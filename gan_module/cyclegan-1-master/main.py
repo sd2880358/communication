@@ -8,8 +8,8 @@ from imageio import imwrite
 import click
 import tensorflow as tf
 
-from . import cyclegan_datasets
-from . import data_loader, losses, model
+import cyclegan_datasets
+import data_loader, losses, model
 
 slim = tf.contrib.slim
 
