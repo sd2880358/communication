@@ -4,8 +4,7 @@ import json
 import numpy as np
 import os
 import random
-from scipy.misc import imsave
-
+from imageio import imwrite
 import click
 import tensorflow as tf
 
@@ -213,7 +212,7 @@ class CycleGAN:
 
                 for name, tensor in zip(names, tensors):
                     image_name = name + str(epoch) + "_" + str(i) + ".jpg"
-                    imsave(os.path.join(self._images_dir, image_name),
+                    imwrite(os.path.join(self._images_dir, image_name),
                            ((tensor[0] + 1) * 127.5).astype(np.uint8)
                            )
                     v_html.write(
