@@ -3,11 +3,11 @@ import numpy as np
 'import matplotlib.pyplot as plt'
 import scipy.io as sc
 import pandas as pd
-'import seaborn as sns'
+import seaborn as sns
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
-import os
+
 
 
 
@@ -77,7 +77,7 @@ def build_and_compile_model(norm):
         layers.Dense(20)
     ])
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  optimizer=tf.keras.optimizers.Adam(0.001),
+                  optimizer=tf.keras.optimizers.Adam(0.01),
                   metrics=['accuracy'])
     return model
 
@@ -90,9 +90,34 @@ def get_total_loss(predict_label, true_label):
             i = i + test1
     return i / len(predict_label)
 '''
+def get_train(myTable, epochs):
+    dataset = myTable.copy()
+    train_dataset = dataset.sample(frac=0.8, random_state=0)
+    test_dataset = dataset.drop(train_dataset.index)
+    train_features = train_dataset.copy()
+    test_features = test_dataset.copy()
+    train_labels = pd.DataFrame([train_features.pop('label')]).T
+    test_labels = pd.DataFrame([test_features.pop('label')]).T
+    normalizer = preprocessing.Normalization()
+    normalizer.adapt(np.array(train_features))
+    dnn_real_model = build_and_compile_model(normalizer)
+    history = dnn_real_model.fit(
+        train_features, train_labels,
+        validation_split=0.2,
+        epochs=epochs, verbose=0)
+    hist = pd.DataFrame(history.history)
+    hist['epoch'] = history.epoch
+    test_results = {}
+    test_results['signal'] = dnn_real_model.evaluate(
+        test_features,
+        test_labels, verbose=0)
+    probability_model = tf.keras.Sequential([dnn_real_model,
+                                             tf.keras.layers.Softmax()])
 
+    cf_ori = confusion_matrix(probability_model, test_features, test_labels)
+    return cf_ori, test_results
 
-def get_training(myTable, epochs, cross_data):
+def get_cross_training(myTable, epochs, cross_data):
     train_dataset = training_set(myTable)
     test_dataset = test_set(myTable, train_dataset)
     train_features = train_dataset.copy()
@@ -196,7 +221,7 @@ def batch_result(cf):
 
 def cross_test(train_set, test_set, ori, cross, test_result):
     test_dataset = test_set.sample(frac=0.2, random_state=0)
-    cf_ori, cf_cross, result = get_training(train_set, 20, test_dataset)
+    cf_ori, cf_cross, result = get_cross_training(train_set, 20, test_dataset)
     cf_ori_array = batch_result(cf_ori)
     cf_cross_array = batch_result(cf_cross)
     result = pd.DataFrame(result).T
@@ -206,43 +231,4 @@ def cross_test(train_set, test_set, ori, cross, test_result):
     return [ori, cross, test_result]
 
 
-
-data1 = "intermediate"
-data1_label = "intermediate_label"
-data2 = "hard"
-data2_label = "hard_label"
-data3 = "data"
-data3_label = "data_label"
-
-table1 = dataset(data1, data1_label)
-table2 = dataset(data2, data2_label)
-test1_ori = pd.DataFrame()
-test2_ori = pd.DataFrame()
-test1_cross = pd.DataFrame()
-test2_cross = pd.DataFrame()
-test1_accuracy = pd.DataFrame()
-test2_accuracy =  pd.DataFrame()
-file_directory = './result/cross_testing'
-
-
-for i in range(0,10):
-    i = str(i+1)
-    test1_ori, test1_cross, test1_accuracy = cross_test(table1, table2,
-                                                        test1_ori, test1_cross,
-                                                        test1_accuracy)
-    test2_ori, test2_cross, test2_accuracy = cross_test(table2, table1,
-                                                        test2_ori, test2_cross,
-                                                        test2_accuracy)
-    print("This is the {} time".format(i))
-
-
-
-if not os.path.exists(file_directory):
-    os.makedirs(file_directory)
-test1_ori.to_csv(file_directory +'/test1_ori_error_rate.csv', index=False)
-test1_cross.to_csv(file_directory +'/test1_cross_error_rate.csv', index=False)
-test2_ori.to_csv(file_directory + '/test2_ori_error_rate.csv', index=False)
-test2_cross.to_csv(file_directory + '/test2_cross_error_rate.csv', index=False)
-test1_accuracy.to_csv(file_directory + '/test1_accuracy.csv', index=False)
-test2_accuracy.to_csv(file_directory + '/test2_accuracy.csv', index=False)
 
