@@ -142,7 +142,7 @@ def train(test_data, test_label, epochs):
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
-        if (epoch+1) % 100 == 0:
+        if (epoch+1) % 50 == 0:
             print(cal_cycle_loss(fake_array, test_label))
 generator = make_generator_model()
 discriminator = make_discriminator_model()
