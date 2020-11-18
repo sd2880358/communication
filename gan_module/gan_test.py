@@ -107,7 +107,7 @@ cycle_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 
 
-EPOCHS = 50
+EPOCHS = 1000
 
 
 # Notice the use of `tf.function`
@@ -138,13 +138,12 @@ def train(test_data, test_label, epochs):
             label = test_label[i]
             train_step(noise, label)
             fake_array.append(generator(noise).numpy())
-        print('Time for epoch {} is {} sec'.format(epoch + 1, time.time() - start))
         if (epoch + 1) % 5 == 0:
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
-
-        print(cal_cycle_loss(fake_array, test_label))
+        if (epoch+1) % 100 == 0:
+            print(cal_cycle_loss(fake_array, test_label))
 generator = make_generator_model()
 discriminator = make_discriminator_model()
 checkpoint_path = "./checkpoints/intermediate"
