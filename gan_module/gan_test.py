@@ -40,8 +40,8 @@ def table_data(my_data):
     data = np.dstack([my_data.real.T, my_data.imag.T])
     return data
 
-data1 = "hard"
-data1_label = "hard_label"
+data1 = "intermediate"
+data1_label = "intermediate_label"
 data, label = dataset(data1, data1_label)
 test_data = data.reshape(1000,1,50,2)
 test_label = label.reshape(1000,1,50,1)
@@ -53,10 +53,6 @@ SIGNAL_SIZE = 2
 BlockSize = 50
 Lambda = 10
 
-def random_crop(image):
-    cropped_image = tf.image.random_crop(
-      image, size=[IMG_HEIGHT, IMG_WIDTH, 3])
-    return cropped_image
 
 def normalize(image):
     image = tf.cast(image, tf.float32)
@@ -105,9 +101,9 @@ def cal_cycle_loss(real, fake):
     loss1 = tf.reduce_mean(tf.abs(real - fake))
     return LAMBDA * loss1
 
-generator_optimizer = tf.keras.optimizers.Adam(1e-2)
-discriminator_optimizer = tf.keras.optimizers.Adam(1e-2)
-cycle_optimizer = tf.keras.optimizers.Adam(1e-2)
+generator_optimizer = tf.keras.optimizers.Adam(1e-4)
+discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+cycle_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 
 
@@ -151,7 +147,7 @@ def train(test_data, test_label, epochs):
         print(cal_cycle_loss(fake_array, test_label))
 generator = make_generator_model()
 discriminator = make_discriminator_model()
-checkpoint_path = "./checkpoints/train"
+checkpoint_path = "./checkpoints/intermediate"
 checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
                                  generator=generator,
