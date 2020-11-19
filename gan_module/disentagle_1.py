@@ -168,7 +168,7 @@ if ckpt_manager.latest_checkpoint:
     print ('Latest checkpoint restored!!')
 
 LAMBDA = 10
-EPOCHS = 50
+EPOCHS = 20
 data1 = "hard"
 data1_label = "hard_label"
 data = dataset(data1, data1_label)
@@ -190,7 +190,8 @@ for epoch in range(EPOCHS):
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
 
-    if (epoch + 1) % 20 == 0:
+    if (epoch + 1) % 5 == 0:
+        id = str(epoch)
         s = generator_s(test_feature, training=False)
         i = generator_i(test_feature, training=False)
         n = generator_n(test_feature, training=False)
@@ -206,9 +207,9 @@ for epoch in range(EPOCHS):
         cf_ori, test_result = mt.get_train(mlcData, 20)
         if not os.path.exists(file_directory):
             os.makedirs(file_directory)
-        cf_ori.to_csv(file_directory + '/test1' + epoch, index=False)
+        cf_ori.to_csv(file_directory + '/test1' + id, index=False)
         cf_new = mt.batch_result(cf_ori)
-        cf_new.to_csv(file_directory + '/batch' + epoch, index=False)
+        cf_new.to_csv(file_directory + '/batch' + id, index=False)
         test_result = pd.DataFrame(test_result)
-        test_result.to_csv(file_directory+'result' + epoch, index=False)
+        test_result.to_csv(file_directory+'result' + id, index=False)
 
