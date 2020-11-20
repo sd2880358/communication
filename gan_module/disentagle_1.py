@@ -144,12 +144,12 @@ discriminator_t = make_discriminator_model()
 discriminator_d = make_discriminator_model()
 
 
-generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+generator_s_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
+generator_n_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
+generator_i_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
 
-discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
+discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-5, beta_1=0.5)
 
 checkpoint_path = "./checkpoints/dis1"
 
@@ -189,14 +189,14 @@ for epoch in range(EPOCHS):
         if n % 10 == 0:
             print ('.', end='')
             n+=1
-    if (epoch + 1) % 5 == 0:
+    if  epoch > 0:
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
 
-    if (epoch + 1) % 5 == 0:
+    if  epoch > 0:
         id = str(epoch)
         s = generator_s(test_feature, training=False)
         i = generator_i(test_feature, training=False)
