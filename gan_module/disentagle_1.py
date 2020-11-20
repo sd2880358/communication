@@ -106,7 +106,7 @@ def train_step(total, label):
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = 0.5*gen_loss + 0.5*(identity_s_loss + identity_g_loss)
+        total_s_loss = 0.2*(gen_loss+identity_g_loss) + 0.8*(identity_s_loss)
         total_n_loss = identity_g_loss + gen_loss
         total_i_loss = identity_g_loss + gen_loss
         print()
@@ -202,10 +202,10 @@ for epoch in range(EPOCHS):
         i = generator_i(test_feature, training=False)
         n = generator_n(test_feature, training=False)
         gen = s + i + n
-        test = np.array([(gen - test_feature)])
-        signal_loss = np.array([s - test_label]).mean()
-        print('The generator total loss is', test.mean())
-        print('The signal loss is ', signal_loss.mean())
+        test = identity_loss(s, test_label)
+        gen_loss = identity_loss(gen, test_feature)
+        print('The generator total loss is', gen_loss)
+        print('The signal loss is ', test)
         real = np.array([s[:, 0]])
         imag = np.array([s[:, 1]])
         size = real.size
