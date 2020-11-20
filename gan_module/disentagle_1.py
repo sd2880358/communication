@@ -9,10 +9,9 @@ from tensorflow.keras.layers.experimental import preprocessing
 import time
 from IPython.display import clear_output
 import math
-import mlcTest as mt
 def dataset(dataFile, labelFile):
-    dataFile = "./communication/" + dataFile
-    labelFile = "./communication/" + labelFile
+    dataFile = "../communication/" + dataFile
+    labelFile = "../communication/" + labelFile
     my_data = sc.loadmat(dataFile)
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']
@@ -172,7 +171,7 @@ if ckpt_manager.latest_checkpoint:
     print ('Latest checkpoint restored!!')
 
 LAMBDA = 10
-EPOCHS = 20
+EPOCHS = 40
 data1 = "hard"
 data1_label = "hard_label"
 data = dataset(data1, data1_label)
@@ -189,14 +188,14 @@ for epoch in range(EPOCHS):
         if n % 10 == 0:
             print ('.', end='')
             n+=1
-    if  epoch > 0:
+    if  (epoch+1)%5 == 0:
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
 
-    if  epoch > 0:
+    if  (epoch+1)%5 == 0:
         id = str(epoch)
         s = generator_s(test_feature, training=False)
         i = generator_i(test_feature, training=False)
@@ -204,8 +203,12 @@ for epoch in range(EPOCHS):
         gen = s + i + n
         test = identity_loss(s, test_label)
         gen_loss = identity_loss(gen, test_feature)
+        print("_____Test Result:_____")
         print('The generator total loss is', gen_loss)
         print('The signal loss is ', test)
+        print("___________________\n")
+
+        '''
         real = np.array([s[:, 0]])
         imag = np.array([s[:, 1]])
         size = real.size
@@ -219,3 +222,4 @@ for epoch in range(EPOCHS):
         test_result = pd.DataFrame(test_result)
         test_result.to_csv(file_directory+'result' + id, index=False)
 
+        '''
