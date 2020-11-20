@@ -126,6 +126,12 @@ def train_step(total, label):
 
 def shuffle_data(my_table):
     data.sample(frac=1)
+    real_y = (2*my_table.real.min())/(my_table.real.max() - my_table.real.min()) + 1
+    real_x = (my_table.real.max()) / (1 + real_y)
+    imag_y = (2*my_table.imag.min())/(my_table.imag.max() - my_table.imag.min()) + 1
+    imag_x = (my_table.imag.max()) / (1 + imag_y)
+    my_table.real = (my_table.real / real_x) - real_y
+    my_table.imag = (my_table.imag/ imag_x) - imag_y
     train_feature = data.loc[:, ('real', 'imag')]
     train_label = data.loc[:, ('label_real', 'label_imag')]
     test_feature = tf.cast(train_feature, tf.float32)
@@ -147,7 +153,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/dis"
+checkpoint_path = "./checkpoints/dis1"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
@@ -172,7 +178,7 @@ EPOCHS = 20
 data1 = "hard"
 data1_label = "hard_label"
 data = dataset(data1, data1_label)
-file_directory = './result/tes1/'
+file_directory = './result/tes2/'
 for epoch in range(EPOCHS):
     test_feature, test_label, symbol = shuffle_data(data)
     start = time.time()
