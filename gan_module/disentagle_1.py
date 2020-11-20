@@ -101,16 +101,14 @@ def train_step(total, label):
         real_t = discriminator_t(total, training=True)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
-        s_loss = generator_loss(s)
-        n_loss = generator_loss(n)
-        i_loss = generator_loss(i)
+        gen_loss = generator_loss(gen)
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = 0.5 * (identity_s_loss + s_loss) + 0.5 * (identity_g_loss)
-        total_n_loss = identity_g_loss + n_loss
-        total_i_loss = identity_g_loss + i_loss
+        total_s_loss = gen_loss + (identity_s_loss + identity_g_loss)
+        total_n_loss = identity_g_loss + gen_loss
+        total_i_loss = identity_g_loss + gen_loss
         print()
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
