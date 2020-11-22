@@ -10,8 +10,8 @@ import time
 from IPython.display import clear_output
 import math
 def dataset(dataFile, labelFile):
-    dataFile = "../communication/" + dataFile
-    labelFile = "../communication/" + labelFile
+    dataFile = "../ML_Symbol_Gen-main/" + dataFile
+    labelFile = "../ML_Symbol_Gen-main/" + labelFile
     my_data = sc.loadmat(dataFile)
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']
@@ -150,7 +150,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/dis1"
+checkpoint_path = "./checkpoints/test1"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
@@ -172,8 +172,8 @@ if ckpt_manager.latest_checkpoint:
 
 LAMBDA = 10
 EPOCHS = 40
-data1 = "hard"
-data1_label = "hard_label"
+data1 = "my_data"
+data1_label = "my_labels"
 data = dataset(data1, data1_label)
 file_directory = './result/tes2/'
 for epoch in range(EPOCHS):
