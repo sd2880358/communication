@@ -190,7 +190,10 @@ for epoch in range(EPOCHS):
             print('.', end='')
             n += 1
 
-    if ((epoch + 1) % 5) == 0:
+    if  (epoch+1)%5 == 0:
+        ckpt_save_path = ckpt_manager.save()
+        print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
+                                                            ckpt_save_path))
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
     if ((epoch + 1) % 5) == 0:
