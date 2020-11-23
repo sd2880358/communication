@@ -176,7 +176,7 @@ if ckpt_manager.latest_checkpoint:
     print ('Latest checkpoint restored!!')
 
 LAMBDA = 10
-EPOCHS = 40
+EPOCHS = 500
 data1 = "my_data"
 data1_label = "my_labels"
 data = dataset(data1, data1_label)
@@ -194,7 +194,7 @@ for epoch in range(EPOCHS):
             print('.', end='')
             n += 1
 
-    if  (epoch+1)%5 == 0:
+    if  (epoch+1)%10 == 0:
         ckpt_save_path = ckpt_manager.save()
         print("_____Test Result:_____")
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
