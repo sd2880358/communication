@@ -59,8 +59,9 @@ def table_data(my_data, cons, label):
 
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(50, use_bias=False, input_shape=[50,2]))
-    model.add(layers.Dense(50, activation='relu'))
+    model.add(layers.Dense(128, use_bias=False, input_shape=[50,2]))
+    model.add(layers.Dense(128, activation='relu'))
+    model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(2))
     return model
 
@@ -68,6 +69,7 @@ def make_generator():
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Dense(20, use_bias=False, input_shape=[50,2]))
+    model.add(layers.Dense(50, activation='relu'))
     model.add(layers.Dense(50, activation = 'sigmoid'))
     model.add(layers.Flatten())
     model.add(layers.Dense(1))
