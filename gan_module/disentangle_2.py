@@ -64,6 +64,8 @@ def make_generator():
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
+    model.add(layers.Dense(128, activation='relu'))
+    model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(2))
     return model
 
@@ -71,6 +73,8 @@ def make_generator():
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Dense(20, use_bias=False, input_shape=[50,2]))
+    model.add(layers.Dense(128, activation='relu'))
+    model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
@@ -157,7 +161,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/test5"
+checkpoint_path = "./checkpoints/test7"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
