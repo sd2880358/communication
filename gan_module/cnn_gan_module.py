@@ -57,21 +57,32 @@ def table_data(my_data, cons, label):
                             'label': label_array})
     return test_pd
 
-def generator():
+def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(20, use_bias=False, input_shape=[2,]))
-    model.add(layers.Dense(50, activation='relu'))
-    model.add(layers.Dense(2))
+    model.add(layers.Dense(25*2*1, use_bias=False, input_shape=[50,2]))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+    model.add(layers.Reshape((5, 5, 100)))
+    model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(100))
+    model.add(layers.Reshape((50,2)))
     return model
 
 def make_discriminator_model():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(20, use_bias=False, input_shape=[2,]))
-    model.add(layers.Dense(50, activation = 'sigmoid'))
+    model.add(layers.Reshape((5, 5, 4)))
+    model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
+                                     input_shape=[5, 5, 2]))
+    model.add(layers.LeakyReLU())
+    model.add(layers.Dropout(0.3))
+    model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
+    model.add(layers.LeakyReLU())
+    model.add(layers.Dropout(0.3))
+
+    model.add(layers.Flatten())
     model.add(layers.Dense(1))
     return model
-
-
 
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
@@ -95,12 +106,13 @@ def train_step(total, label):
         s = generator_s(total, training=True)
         n = generator_n(total, training=True)
         i = generator_i(total, training=True)
-        gen = s + n + i
+        gen = (s + n + i)
+        gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
+        gen_loss = generator_loss(gen)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
-        gen_loss = generator_loss(gen)
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
@@ -108,7 +120,6 @@ def train_step(total, label):
         total_s_loss = 0.2*(gen_loss+identity_g_loss) + 0.8*(identity_s_loss)
         total_n_loss = identity_g_loss + gen_loss
         total_i_loss = identity_g_loss + gen_loss
-        print()
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
     gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
@@ -122,7 +133,6 @@ def train_step(total, label):
     discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
 def shuffle_data(my_table):
-    data.sample(frac=1)
     real_y = (2*my_table.real.min())/(my_table.real.max() - my_table.real.min()) + 1
     real_x = (my_table.real.max()) / (1 + real_y)
     imag_y = (2*my_table.imag.min())/(my_table.imag.max() - my_table.imag.min()) + 1
@@ -133,12 +143,14 @@ def shuffle_data(my_table):
     train_label = data.loc[:, ('label_real', 'label_imag')]
     test_feature = tf.cast(train_feature, tf.float32)
     test_label = tf.cast(train_label, tf.float32)
+    test_feature = tf.reshape(test_feature,(1000,1,50,2))
+    test_label = tf.reshape(test_label, (1000,1,50,2))
     symbol = data.loc[:, 'label']
-    return test_feature, test_label, symbol
+    return test_feature, test_label
 
-generator_s = generator()
-generator_n = generator()
-generator_i = generator()
+generator_s = make_generator()
+generator_n = make_generator()
+generator_i = make_generator()
 discriminator_t = make_discriminator_model()
 discriminator_d = make_discriminator_model()
 
@@ -150,7 +162,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/test1"
+checkpoint_path = "./checkpoints/test5"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
@@ -176,47 +188,34 @@ data1 = "my_data"
 data1_label = "my_labels"
 data = dataset(data1, data1_label)
 file_directory = './result/tes2/'
+f, l = shuffle_data(data)
+
 for epoch in range(EPOCHS):
-    test_feature, test_label, symbol = shuffle_data(data)
     start = time.time()
     n = 0
-
-    for i in range(len(test_feature)):
-        test = tf.reshape(test_feature[i], [1,2])
-        label = tf.reshape(test_label[i], [1,2])
+    for i in range(len(f)):
+        test = f[i]
+        label = l[i]
         train_step(test, label)
         if n % 10 == 0:
-            n+=1
+            print('.', end='')
+            n += 1
+
     if  (epoch+1)%5 == 0:
-        print("_____Test Result:_____")
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
+    if ((epoch + 1) % 5) == 0:
         id = str(epoch)
-        s = generator_s(test_feature, training=False)
-        i = generator_i(test_feature, training=False)
-        n = generator_n(test_feature, training=False)
+        s = generator_s(f, training=False)
+        i = generator_i(f, training=False)
+        n = generator_n(f, training=False)
         gen = s + i + n
-        test = identity_loss(s, test_label)
-        gen_loss = identity_loss(gen, test_feature)
+        test = identity_loss(s, l)
+        gen_loss = identity_loss(gen, f)
+        print("_____Test Result:_____")
         print('The generator total loss is', gen_loss)
         print('The signal loss is ', test)
         print("___________________\n")
-
-        '''
-        real = np.array([s[:, 0]])
-        imag = np.array([s[:, 1]])
-        size = real.size
-        mlcData = pd.DataFrame({'real':real.reshape(size), 'imag':imag.reshape(size), 'label':symbol})
-        cf_ori, test_result = mt.get_train(mlcData, 20)
-        if not os.path.exists(file_directory):
-            os.makedirs(file_directory)
-        cf_ori.to_csv(file_directory + '/test' + id, index=False)
-        cf_new = mt.batch_result(cf_ori)
-        cf_new.to_csv(file_directory + '/batch' + id, index=False)
-        test_result = pd.DataFrame(test_result)
-        test_result.to_csv(file_directory+'result' + id, index=False)
-
-        '''
