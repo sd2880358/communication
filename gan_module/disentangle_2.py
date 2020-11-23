@@ -157,7 +157,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/test4"
+checkpoint_path = "./checkpoints/test5"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
@@ -198,11 +198,11 @@ for epoch in range(EPOCHS):
 
     if  (epoch+1)%5 == 0:
         ckpt_save_path = ckpt_manager.save()
+        print("_____Test Result:_____")
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
-    if ((epoch + 1) % 5) == 0:
         id = str(epoch)
         s = generator_s(f, training=False)
         i = generator_i(f, training=False)
@@ -210,7 +210,7 @@ for epoch in range(EPOCHS):
         gen = s + i + n
         test = identity_loss(s, l)
         gen_loss = identity_loss(gen, f)
-        print("_____Test Result:_____")
+
         print('The generator total loss is', gen_loss)
         print('The signal loss is ', test)
         print("___________________\n")
