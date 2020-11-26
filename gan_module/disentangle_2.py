@@ -110,7 +110,7 @@ def train_step(total, label):
     with tf.GradientTape(persistent=True) as tape:
         s = generator_s(total, training=True)
         n = generator_n(total, training=True)
-        i = generator_i(total, training=True)
+        i = generator_i(s, training=True)
         gen = (s + n + i)
         gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
@@ -167,7 +167,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/test8"
+checkpoint_path = "./checkpoints/method1"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
@@ -215,7 +215,7 @@ for epoch in range(EPOCHS):
                                                            time.time() - start))
         id = str(epoch)
         s = generator_s(f, training=False)
-        i = generator_i(f, training=False)
+        i = generator_i(s, training=False)
         n = generator_n(f, training=False)
         gen = s + i + n
         test = identity_loss(s, l)
