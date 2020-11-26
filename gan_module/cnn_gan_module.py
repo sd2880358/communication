@@ -57,23 +57,23 @@ def table_data(my_data, cons, label):
                             'label': label_array})
     return test_pd
 
+
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(25*2*1, use_bias=False, input_shape=[50,2]))
+    model.add(layers.Dense(2, use_bias=False, input_shape=[50,2]))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
-    model.add(layers.Reshape((5, 5, 100)))
-    model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
-    model.add(layers.Flatten())
-    model.add(layers.Dense(100))
+    model.add(layers.Reshape((50, 2, 1)))
+    model.add(layers.Conv2DTranspose(128, (2, 1), strides=(1, 1), padding='same', use_bias=False))
+    model.add(layers.Dense(1))
     model.add(layers.Reshape((50,2)))
     return model
 
 def make_discriminator_model():
     model = tf.keras.Sequential()
-    model.add(layers.Reshape((5, 5, 4)))
-    model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
-                                     input_shape=[5, 5, 2]))
+    model.add(layers.Reshape((50, 2, 1)))
+    model.add(layers.Conv2D(64, (2, 1), strides=(1, 1), padding='same',
+                                     input_shape=[1, 50, 2]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
     model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
@@ -162,8 +162,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/test5"
-
+checkpoint_path = "./checkpoints/cnn"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
                            generator_i=generator_i,
@@ -181,9 +180,8 @@ ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
 if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
-
 LAMBDA = 10
-EPOCHS = 40
+EPOCHS = 5
 data1 = "my_data"
 data1_label = "my_labels"
 data = dataset(data1, data1_label)
@@ -201,21 +199,22 @@ for epoch in range(EPOCHS):
             print('.', end='')
             n += 1
 
-    if  (epoch+1)%5 == 0:
+
+    if ((epoch + 1) % 5) == 0:
+        id = str(epoch)
+        feature = tf.reshape(f, (1000,50,2))
+        s = generator_s(feature, training=False)
+        i = generator_i(feature, training=False)
+        n = generator_n(feature, training=False)
+        gen = s + i + n
+        test = identity_loss(s, l)
+        gen_loss = identity_loss(gen, f)
+        print("_____Test Result:_____")
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
-    if ((epoch + 1) % 5) == 0:
-        id = str(epoch)
-        s = generator_s(f, training=False)
-        i = generator_i(f, training=False)
-        n = generator_n(f, training=False)
-        gen = s + i + n
-        test = identity_loss(s, l)
-        gen_loss = identity_loss(gen, f)
-        print("_____Test Result:_____")
         print('The generator total loss is', gen_loss)
         print('The signal loss is ', test)
         print("___________________\n")
