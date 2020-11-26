@@ -115,7 +115,7 @@ def train_step(total, label):
         gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
-        gen_loss = generator_loss(gen)
+        gen_loss = generator_loss(fake_t)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
         disc_t_loss = discriminator_loss(real_t, fake_t)
