@@ -118,11 +118,12 @@ def train_step(total, label):
         gen_loss = generator_loss(fake_t)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
+        gen_s_loss = generator_loss(fake_d)
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = 0.2*(gen_loss+identity_g_loss) + 0.8*(identity_s_loss)
+        total_s_loss = gen_loss+identity_g_loss + identity_s_loss + gen_s_loss
         total_n_loss = identity_g_loss + gen_loss
         total_i_loss = identity_g_loss + gen_loss
 
@@ -167,7 +168,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/method1"
+checkpoint_path = "./checkpoints/method2"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
