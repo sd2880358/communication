@@ -110,14 +110,15 @@ def train_step(total, label):
         gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
-        gen_loss = generator_loss(gen)
+        gen_loss = generator_loss(fake_t)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
+        gen_s_loss = generator_loss(fake_d)
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = 0.2*(gen_loss+identity_g_loss) + 0.8*(identity_s_loss)
+        total_s_loss = gen_loss+identity_g_loss + identity_s_loss + gen_s_loss
         total_n_loss = identity_g_loss + gen_loss
         total_i_loss = identity_g_loss + gen_loss
 
@@ -133,12 +134,14 @@ def train_step(total, label):
     discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
 def shuffle_data(my_table):
+    '''
     real_y = (2*my_table.real.min())/(my_table.real.max() - my_table.real.min()) + 1
     real_x = (my_table.real.max()) / (1 + real_y)
     imag_y = (2*my_table.imag.min())/(my_table.imag.max() - my_table.imag.min()) + 1
     imag_x = (my_table.imag.max()) / (1 + imag_y)
     my_table.real = (my_table.real / real_x) - real_y
     my_table.imag = (my_table.imag/ imag_x) - imag_y
+    '''
     train_feature = data.loc[:, ('real', 'imag')]
     train_label = data.loc[:, ('label_real', 'label_imag')]
     test_feature = tf.cast(train_feature, tf.float32)
