@@ -65,10 +65,6 @@ def make_generator():
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(2))
     return model
 
@@ -76,9 +72,6 @@ def make_generator():
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Dense(20, use_bias=False, input_shape=[50,2]))
-    model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dense(128, activation='relu'))
-    model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
@@ -110,7 +103,7 @@ def train_step(total, label):
     with tf.GradientTape(persistent=True) as tape:
         s = generator_s(total, training=True)
         n = generator_n(total, training=True)
-        i = generator_i(s, training=True)
+        i = generator_i(total, training=True)
         gen = (s + n + i)
         gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
@@ -119,13 +112,14 @@ def train_step(total, label):
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
         gen_s_loss = generator_loss(fake_d)
+        gen_total_loss = 1/2 * gen_s_loss + gen_loss
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = identity_g_loss + identity_s_loss + gen_s_loss
-        total_n_loss = identity_g_loss + gen_loss
-        total_i_loss = identity_g_loss + gen_loss
+        total_s_loss = identity_g_loss + 1/2* identity_s_loss + gen_total_loss
+        total_n_loss = identity_g_loss + gen_total_loss
+        total_i_loss = identity_g_loss + gen_total_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
     gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
@@ -168,7 +162,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/method2"
+checkpoint_path = "./checkpoints/method3"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
