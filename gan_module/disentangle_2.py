@@ -133,12 +133,15 @@ def train_step(total, label):
     discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
 def shuffle_data(my_table):
+
+    '''
     real_y = (2*my_table.real.min())/(my_table.real.max() - my_table.real.min()) + 1
     real_x = (my_table.real.max()) / (1 + real_y)
     imag_y = (2*my_table.imag.min())/(my_table.imag.max() - my_table.imag.min()) + 1
     imag_x = (my_table.imag.max()) / (1 + imag_y)
     my_table.real = (my_table.real / real_x) - real_y
     my_table.imag = (my_table.imag/ imag_x) - imag_y
+    '''
     train_feature = data.loc[:, ('real', 'imag')]
     train_label = data.loc[:, ('label_real', 'label_imag')]
     test_feature = tf.cast(train_feature, tf.float32)
