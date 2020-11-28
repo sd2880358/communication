@@ -108,18 +108,18 @@ def train_step(total, label):
         gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
-        gen_loss = generator_loss(fake_t)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
+        gen_loss = generator_loss(fake_t)
         gen_s_loss = generator_loss(fake_d)
-        gen_total_loss = 1/2 * gen_s_loss + gen_loss
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = identity_g_loss + 1/2* identity_s_loss + gen_total_loss
-        total_n_loss = identity_g_loss + gen_total_loss
-        total_i_loss = identity_g_loss + gen_total_loss
+        identity_total_loss = identity_g_loss + identity_s_loss
+        total_s_loss = identity_total_loss + 1/2 * gen_loss  + gen_s_loss + identity_s_loss
+        total_n_loss = identity_total_loss + gen_loss
+        total_i_loss = identity_total_loss + gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
     gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
@@ -133,15 +133,12 @@ def train_step(total, label):
     discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
 def shuffle_data(my_table):
-
-    '''
     real_y = (2*my_table.real.min())/(my_table.real.max() - my_table.real.min()) + 1
     real_x = (my_table.real.max()) / (1 + real_y)
     imag_y = (2*my_table.imag.min())/(my_table.imag.max() - my_table.imag.min()) + 1
     imag_x = (my_table.imag.max()) / (1 + imag_y)
     my_table.real = (my_table.real / real_x) - real_y
     my_table.imag = (my_table.imag/ imag_x) - imag_y
-    '''
     train_feature = data.loc[:, ('real', 'imag')]
     train_label = data.loc[:, ('label_real', 'label_imag')]
     test_feature = tf.cast(train_feature, tf.float32)
@@ -165,7 +162,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/method3"
+checkpoint_path = "./checkpoints/method5"
 
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,

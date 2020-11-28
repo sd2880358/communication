@@ -110,17 +110,18 @@ def train_step(total, label):
         gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
-        gen_loss = generator_loss(fake_t)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
+        gen_loss = generator_loss(fake_t)
         gen_s_loss = generator_loss(fake_d)
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = gen_loss+identity_g_loss + identity_s_loss + gen_s_loss
-        total_n_loss = identity_g_loss + gen_loss
-        total_i_loss = identity_g_loss + gen_loss
+        identity_total_loss = identity_g_loss + identity_s_loss
+        total_s_loss = identity_total_loss + 1/2 * gen_loss  + gen_s_loss + identity_s_loss
+        total_n_loss = identity_total_loss + gen_loss
+        total_i_loss = identity_total_loss + gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
     gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
