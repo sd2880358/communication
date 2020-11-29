@@ -10,8 +10,8 @@ import time
 from IPython.display import clear_output
 import math
 def dataset(dataFile, labelFile):
-    dataFile = "../communication/" + dataFile
-    labelFile = "../communication/" + labelFile
+    dataFile = "../ML_Symbol_Gen-main/" + dataFile
+    labelFile = "../ML_Symbol_Gen-main/" + labelFile
     my_data = sc.loadmat(dataFile)
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']
@@ -184,8 +184,8 @@ if ckpt_manager.latest_checkpoint:
     print ('Latest checkpoint restored!!')
 LAMBDA = 10
 EPOCHS = 500
-data1 = "intermediate"
-data1_label = "intermediate_label"
+data1 = "my_data"
+data1_label = "my_labels"
 data = dataset(data1, data1_label)
 file_directory = './result/tes2/'
 f, l = shuffle_data(data)
