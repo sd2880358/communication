@@ -117,9 +117,10 @@ def train_step(total, label):
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        total_s_loss = gen_loss+identity_g_loss + identity_s_loss + gen_s_loss
-        total_n_loss = identity_g_loss + gen_loss
-        total_i_loss = identity_g_loss + gen_loss
+        total_gen_loss = 1/2 * gen_s_loss + gen_loss
+        total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
+        total_n_loss = identity_g_loss + total_gen_loss
+        total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
     gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
