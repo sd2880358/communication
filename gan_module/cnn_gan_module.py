@@ -183,7 +183,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 LAMBDA = 10
-EPOCHS = 50
+EPOCHS = 500
 data1 = "my_data"
 data1_label = "my_labels"
 data = dataset(data1, data1_label)
