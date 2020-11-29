@@ -60,7 +60,7 @@ def table_data(my_data, cons, label):
 
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(32, (1, 1), activation='relu', input_shape=(1, 30, 2)))
+    model.add(layers.Conv2D(32, (1, 1), activation='relu', input_shape=(1, 50, 2)))
     model.add(layers.MaxPooling2D((1, 1)))
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
     model.add(layers.MaxPooling2D((1, 1)))
@@ -71,9 +71,9 @@ def make_generator():
 
 def make_discriminator_model():
     model = tf.keras.Sequential()
-    model.add(layers.Reshape((30, 2, 1)))
+    model.add(layers.Reshape((50, 2, 1)))
     model.add(layers.Conv2D(64, (2, 1), strides=(1, 1), padding='same',
-                                     input_shape=[1, 30, 2]))
+                                     input_shape=[1, 50, 2]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
     model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
@@ -145,8 +145,8 @@ def shuffle_data(my_table):
     train_label = data.loc[:, ('label_real', 'label_imag')]
     test_feature = tf.cast(train_feature, tf.float32)
     test_label = tf.cast(train_label, tf.float32)
-    test_feature = tf.reshape(test_feature,(1000,1,30,2))
-    test_label = tf.reshape(test_label, (1000,1,30,2))
+    test_feature = tf.reshape(test_feature,(1000,1,50,2))
+    test_label = tf.reshape(test_label, (1000,1,50,2))
     symbol = data.loc[:, 'label']
     return test_feature, test_label
 
@@ -190,7 +190,7 @@ data = dataset(data1, data1_label)
 file_directory = './result/tes2/'
 f, l = shuffle_data(data)
 
-BUFFER_SIZE = 30
+BUFFER_SIZE = 50
 BATCH_SIZE = 256
 train_f = tf.data.Dataset.from_tensor_slices(f).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_l = tf.data.Dataset.from_tensor_slices(l).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
