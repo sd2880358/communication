@@ -10,8 +10,8 @@ import time
 from IPython.display import clear_output
 import math
 def dataset(dataFile, labelFile):
-    dataFile = "../ML_Symbol_Gen-main/" + dataFile
-    labelFile = "../ML_Symbol_Gen-main/" + labelFile
+    dataFile = "../communication/" + dataFile
+    labelFile = "../communication/" + labelFile
     my_data = sc.loadmat(dataFile)
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']
@@ -103,8 +103,8 @@ def identity_loss(real, fake):
 @tf.function
 def train_step(total, label):
     with tf.GradientTape(persistent=True) as tape:
-        s = generator_s(total, training=True)
-        n = generator_n(total, training=True)
+        s = generator_s(total, training=True) * 30
+        n = generator_n(total, training=True) * 30
         i = generator_i(s, training=True)
         gen = (s + n + i)
         fake_t = discriminator_t(gen, training=True)
@@ -185,8 +185,8 @@ if ckpt_manager.latest_checkpoint:
     print ('Latest checkpoint restored!!')
 LAMBDA = 10
 EPOCHS = 500
-data1 = "my_data"
-data1_label = "my_labels"
+data1 = "intermediate"
+data1_label = "intermediate_label"
 data = dataset(data1, data1_label)
 file_directory = './result/tes2/'
 f, l = shuffle_data(data)
@@ -208,8 +208,8 @@ for epoch in range(EPOCHS):
 
     if ((epoch + 1) % 5) == 0:
         id = str(epoch)
-        s = generator_s(f, training=False)
-        i = generator_i(f, training=False)
+        s = generator_s(f, training=False) * 30
+        i = generator_i(f, training=False) * 30
         n = generator_n(f, training=False)
         gen = s + i + n
         test = identity_loss(s, l)
