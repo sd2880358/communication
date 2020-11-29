@@ -60,13 +60,13 @@ def table_data(my_data, cons, label):
 
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(2, use_bias=False, input_shape=[50,2]))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
-    model.add(layers.Reshape((50, 2, 1)))
-    model.add(layers.Conv2DTranspose(128, (2, 1), strides=(1, 1), padding='same', use_bias=False))
-    model.add(layers.Dense(1))
-    model.add(layers.Reshape((50,2)))
+    model.add(layers.Conv2D(32, (1, 1), activation='relu', input_shape=(1, 50, 2)))
+    model.add(layers.MaxPooling2D((1, 1)))
+    model.add(layers.Conv2D(64, (1, 1), activation='relu'))
+    model.add(layers.MaxPooling2D((1, 1)))
+    model.add(layers.Conv2D(64, (1, 1), activation='relu'))
+    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(2))
     return model
 
 def make_discriminator_model():
@@ -107,21 +107,19 @@ def train_step(total, label):
         n = generator_n(total, training=True)
         i = generator_i(total, training=True)
         gen = (s + n + i)
-        gen = tf.reshape(gen, (1,50,2))
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
+        gen_loss = generator_loss(fake_t)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
-        gen_loss = generator_loss(fake_t)
         gen_s_loss = generator_loss(fake_d)
         disc_t_loss = discriminator_loss(real_t, fake_t)
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        identity_total_loss = identity_g_loss + identity_s_loss
-        total_s_loss = identity_total_loss + 1/2 * gen_loss  + gen_s_loss + identity_s_loss
-        total_n_loss = identity_total_loss + gen_loss
-        total_i_loss = identity_total_loss + gen_loss
+        total_s_loss = gen_loss+identity_g_loss + identity_s_loss + gen_s_loss
+        total_n_loss = identity_g_loss + gen_loss
+        total_i_loss = identity_g_loss + gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
     gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
@@ -166,7 +164,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/cnn"
+checkpoint_path = "./checkpoints/method7"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
                            generator_i=generator_i,
@@ -192,13 +190,16 @@ data = dataset(data1, data1_label)
 file_directory = './result/tes2/'
 f, l = shuffle_data(data)
 
+BUFFER_SIZE = 100
+BATCH_SIZE = 50
+train_f = tf.data.Dataset.from_tensor_slices(f).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+train_l = tf.data.Dataset.from_tensor_slices(l).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+
 for epoch in range(EPOCHS):
     start = time.time()
     n = 0
-    for i in range(len(f)):
-        test = f[i]
-        label = l[i]
-        train_step(test, label)
+    for i, j in tf.data.Dataset.zip((train_f, train_l)):
+        train_step(i, j)
         if n % 10 == 0:
             print('.', end='')
             n += 1
@@ -206,10 +207,9 @@ for epoch in range(EPOCHS):
 
     if ((epoch + 1) % 5) == 0:
         id = str(epoch)
-        feature = tf.reshape(f, (1000,50,2))
-        s = generator_s(feature, training=False)
-        i = generator_i(feature, training=False)
-        n = generator_n(feature, training=False)
+        s = generator_s(f, training=False)
+        i = generator_i(f, training=False)
+        n = generator_n(f, training=False)
         gen = s + i + n
         test = identity_loss(s, l)
         gen_loss = identity_loss(gen, f)
