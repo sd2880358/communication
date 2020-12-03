@@ -108,7 +108,7 @@ def identity_loss(real, fake):
     return LAMBDA * 0.5 * loss
 
 def noise_loss(noise_output):
-    return mean_abs_loss(0, noise_output)
+    return mean_abs_loss(0, noise_output) * LAMBDA
 
 
 @tf.function
@@ -132,7 +132,7 @@ def train_step(total, label, noise):
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
-        total_n_loss = n_loss + identity_n_loss + identity_g_loss
+        total_n_loss = n_loss + identity_n_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
