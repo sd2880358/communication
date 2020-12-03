@@ -124,7 +124,7 @@ def train_step(total, label, noise):
     with tf.GradientTape(persistent=True) as tape:
         s = generator_s(total, training=True)
         fake_n = generator_n(total, training=True)
-        i = generator_i(s, training=True)
+        i = generator_i(total, training=True)
         gen = (s + fake_n + i)
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
@@ -140,7 +140,7 @@ def train_step(total, label, noise):
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
-        total_n_loss = n_loss + identity_n_loss
+        total_n_loss = n_loss + identity_n_loss + total_gen_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -236,7 +236,7 @@ for epoch in range(EPOCHS):
     if ((epoch + 1) % 5) == 0:
         id = str(epoch)
         s = generator_s(f, training=False)
-        i = generator_i(s, training=False)
+        i = generator_i(f, training=False)
         fake_n = generator_n(f, training=False)
         gen = s + i + fake_n
         test = identity_loss(s, l)
