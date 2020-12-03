@@ -115,9 +115,9 @@ def noise_loss(noise_output):
 def train_step(total, label, noise):
     with tf.GradientTape(persistent=True) as tape:
         s = generator_s(total, training=True)
-        n = generator_n(total, training=True)
+        fake_n = generator_n(total, training=True)
         i = generator_i(s, training=True)
-        gen = (s + n + i)
+        gen = (s + fake_n + i)
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
         gen_loss = generator_loss(fake_t)
@@ -129,10 +129,10 @@ def train_step(total, label, noise):
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
-        identity_n_loss = identity_loss(noise, n)
+        identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
-        total_n_loss = n_loss + identity_n_loss
+        total_n_loss = n_loss + identity_n_loss + total_gen_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -207,13 +207,13 @@ data = "my_data"
 data_label = "my_labels"
 data = dataset(data, data_label)
 file_directory = './result/tes2/'
-f, l, s, n = shuffle_data(data)
+f, l, s, noise = shuffle_data(data)
 
 BUFFER_SIZE = 50
 BATCH_SIZE = 256
 train_f = tf.data.Dataset.from_tensor_slices(f).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_l = tf.data.Dataset.from_tensor_slices(l).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-train_n = tf.data.Dataset.from_tensor_slices(n).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 
 for epoch in range(EPOCHS):
     start = time.time()
@@ -230,7 +230,7 @@ for epoch in range(EPOCHS):
         s = generator_s(f, training=False)
         i = generator_i(s, training=False)
         fake_n = generator_n(f, training=False)
-        gen = s + i + n
+        gen = s + i + fake_n
         test = identity_loss(s, l)
         gen_loss = identity_loss(gen, f)
         noise_l = identity_loss(fake_n, n)
