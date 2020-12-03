@@ -85,6 +85,7 @@ def make_discriminator_model():
     return model
 
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+mean_abs_loss = tf.keras.losses.MeanAbsoluteError()
 
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
@@ -99,6 +100,9 @@ def identity_loss(real, fake):
     loss = tf.reduce_mean(tf.abs(real - fake))
     return LAMBDA * 0.5 * loss
 
+def noise_loss(noise_output):
+    return mean_abs_loss(0, noise_output)
+
 
 @tf.function
 def train_step(total, label):
@@ -110,6 +114,7 @@ def train_step(total, label):
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
         gen_loss = generator_loss(fake_t)
+        n_loss = noise_loss(n)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
         gen_s_loss = generator_loss(fake_d)
@@ -119,7 +124,7 @@ def train_step(total, label):
         identity_g_loss = identity_loss(total, gen)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
-        total_n_loss = identity_g_loss + total_gen_loss
+        total_n_loss = identity_g_loss + total_gen_loss + n_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -164,7 +169,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/method8"
+checkpoint_path = "./checkpoints/method9"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
                            generator_i=generator_i,
@@ -183,7 +188,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
 LAMBDA = 10
-EPOCHS = 500
+EPOCHS = 5
 data1 = "my_data"
 data1_label = "my_labels"
 data = dataset(data1, data1_label)

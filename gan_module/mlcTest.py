@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-'import matplotlib.pyplot as plt'
+import matplotlib.pyplot as plt
 import scipy.io as sc
 import pandas as pd
 import seaborn as sns
@@ -159,7 +159,7 @@ def get_cross_training(myTable, epochs, cross_data):
 def confusion_matrix(model, feature, label):
     expected = model.predict(feature)
     expected = get_results(expected)
-    cf = tf.math.confusion_matrix(expected, label.to_numpy()).numpy()
+    cf = tf.math.confusion_matrix(expected, label)
     cf = pd.DataFrame(cf)
     return cf
 
@@ -199,12 +199,12 @@ def divide_Result(cf, file_name, test_time):
          cons_16.iloc[i - 4, :].sum() for i in range(4, 20)]).reshape(4, 4)
     symbol_error_results_4 = pd.DataFrame(symbol_error_results_4)
     symbol_error_results_16 = pd.DataFrame(symbol_error_results_16)
-    '''
+
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     plot_heatmap(ax1, symbol_error_results_4, cons_4_error)
     plot_heatmap(ax2, symbol_error_results_16, cons_16_error)
     plt.savefig("./result/"+ test_time+'/'+file_name, dpi=500)
-    '''
+
 
 
 def batch_result(cf):

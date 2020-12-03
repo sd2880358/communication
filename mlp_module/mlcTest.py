@@ -13,8 +13,8 @@ from tensorflow.keras.layers.experimental import preprocessing
 
 
 def dataset(dataFile, labelFile):
-    dataFile = "./communication/" + dataFile
-    labelFile = "./communication/" + labelFile
+    dataFile = "../ML_Symbol_Gen-main/" + dataFile
+    labelFile = "../ML_Symbol_Gen-main/" + labelFile
     my_data = sc.loadmat(dataFile)
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']

@@ -6,8 +6,8 @@ import scipy.io as sc
 import pandas as pd
 import mlcTest as mt
 
-dataFile = "./16QAM/my_data.mat"
-labelFile = './16QAM/my_label.mat'
+dataFile = "../ML_Symbol_Gen-main/my_data.mat"
+labelFile = '../ML_Symbol_Gen-main/my_labels.mat'
 my_data = sc.loadmat(dataFile)
 my_labels = sc.loadmat(labelFile)
 
@@ -28,11 +28,9 @@ def dataClean(my_data, my_labels):
 
 if __name__ == "__main__":
 
-    dataFile = "./16QAM/my_data.mat"
-    labelFile = './16QAM/my_label.mat'
-    my_data = sc.loadmat(dataFile)
-    my_labels = sc.loadmat(labelFile)
-    table = dataClean(my_data, my_labels)
-    cf_ori, result = mt.get_train(table, 1)
+    dataFile = "my_data.mat"
+    labelFile = 'my_labels.mat'
+    table = mt.dataset(dataFile, labelFile)
+    cf_ori, result = mt.get_train(table, 10)
     print(cf_ori, "\n"
         "result is", result)
