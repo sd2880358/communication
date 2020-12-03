@@ -16,7 +16,9 @@ def dataset(dataFile, labelFile):
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']
     X = my_labels['L_S_x']
-    myOrig = table_data(my_data, my_labels['L_Constellations'][0], X)
+    noise = my_labels['N']
+    interference = my_labels['L_Interference'][0]
+    myOrig = table_data(my_data, my_labels['L_Constellations'][0], X, interference, noise)
     mytable = assign_label(myOrig)
     return mytable
 
@@ -35,8 +37,8 @@ def assign_label(data):
     data[data.cons==2].index
     data['buffer'] = 0
     data['buffer'] = 0
-    data.iloc[data[data.cons==1].index, 5] = cons4_label
-    data.iloc[data[data.cons==2].index, 5] = cons16_label
+    data.iloc[data[data.cons==1].index, 8] = cons4_label
+    data.iloc[data[data.cons==2].index, 8] = cons16_label
     data['label_real'] = data.buffer.to_numpy().real
     data['label_imag'] = data.buffer.to_numpy().imag
     myTest = data.copy()
@@ -45,16 +47,21 @@ def assign_label(data):
     return myTest
 
 
-def table_data(my_data, cons, label):
+def table_data(my_data, cons, label, interference, noise):
     block = my_data.shape[1]
     my_data_size = my_data.shape[0] * block
     my_data_div = my_data.T.reshape(my_data_size, )
+    noise = noise.T.reshape(my_data_size, )
     cons_array = np.array([[cons[i]] * my_data.shape[0] for i in range(0, block)]).reshape(my_data_size, )
     block_array = np.array([([i + 1] * my_data.shape[0]) for i in range(0, block)]).reshape(my_data_size, )
+    interference_array = np.array([[interference[i]] * my_data.shape[0]
+                               for i in range(0, block)]).reshape(my_data_size, )
     label_array = label.T.reshape(my_data_size, )
     test_pd = pd.DataFrame({'real': my_data_div.real, 'imag': my_data_div.imag,
                             'cons': cons_array, 'block': block_array,
-                            'label': label_array})
+                            'label': label_array,
+                           'interference':interference_array,
+                           'N_R': noise.real, 'N_I':noise.imag})
     return test_pd
 
 
@@ -105,7 +112,7 @@ def noise_loss(noise_output):
 
 
 @tf.function
-def train_step(total, label):
+def train_step(total, label, noise):
     with tf.GradientTape(persistent=True) as tape:
         s = generator_s(total, training=True)
         n = generator_n(total, training=True)
@@ -122,9 +129,10 @@ def train_step(total, label):
         disc_d_loss = discriminator_loss(real_d, fake_d)
         identity_s_loss = identity_loss(label, s)
         identity_g_loss = identity_loss(total, gen)
+        identity_n_loss = identity_loss(noise, n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
-        total_n_loss = n_loss
+        total_n_loss = n_loss + identity_n_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -139,21 +147,27 @@ def train_step(total, label):
     discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
 def shuffle_data(my_table):
-
+    '''
     real_y = (2*my_table.real.min())/(my_table.real.max() - my_table.real.min()) + 1
     real_x = (my_table.real.max()) / (1 + real_y)
     imag_y = (2*my_table.imag.min())/(my_table.imag.max() - my_table.imag.min()) + 1
     imag_x = (my_table.imag.max()) / (1 + imag_y)
     my_table.real = (my_table.real / real_x) - real_y
     my_table.imag = (my_table.imag/ imag_x) - imag_y
-    train_feature = data.loc[:, ('real', 'imag')]
-    train_label = data.loc[:, ('label_real', 'label_imag')]
+    '''
+    train_feature = my_table.loc[:, ('real', 'imag')]
+    train_label = my_table.loc[:, ('label_real', 'label_imag')]
+    noise = my_table.loc[:, ('N_R', 'N_I')]
     test_feature = tf.cast(train_feature, tf.float32)
     test_label = tf.cast(train_label, tf.float32)
-    test_feature = tf.reshape(test_feature,(1000,1,50,2))
-    test_label = tf.reshape(test_label, (1000,1,50,2))
-    symbol = data.loc[:, 'label']
-    return test_feature, test_label
+    test_noise = tf.cast(noise, tf.float32)
+    block = int(test_feature.shape[0]/50)
+    test_feature = tf.reshape(test_feature,(block,1,50,2))
+    test_label = tf.reshape(test_label, (block,1,50,2))
+    test_noise = tf.reshape(test_noise, (block, 1,50,2))
+    symbol = my_table.loc[:, 'label']
+    symbol = tf.reshape(symbol, (block,1, 50))
+    return test_feature, test_label, symbol, test_noise
 
 generator_s = make_generator()
 generator_n = make_generator()
@@ -169,7 +183,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/method9"
+checkpoint_path = "./checkpoints/method_test"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
                            generator_i=generator_i,
@@ -189,22 +203,23 @@ if ckpt_manager.latest_checkpoint:
     print ('Latest checkpoint restored!!')
 LAMBDA = 10
 EPOCHS = 500
-data1 = "my_data"
-data1_label = "my_labels"
-data = dataset(data1, data1_label)
+data = "my_data"
+data_label = "my_labels"
+data = dataset(data, data_label)
 file_directory = './result/tes2/'
-f, l = shuffle_data(data)
+f, l, s, n = shuffle_data(data)
 
 BUFFER_SIZE = 50
 BATCH_SIZE = 256
 train_f = tf.data.Dataset.from_tensor_slices(f).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_l = tf.data.Dataset.from_tensor_slices(l).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+train_n = tf.data.Dataset.from_tensor_slices(n).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 
 for epoch in range(EPOCHS):
     start = time.time()
     n = 0
-    for i, j in tf.data.Dataset.zip((train_f, train_l)):
-        train_step(i, j)
+    for i, j, k in tf.data.Dataset.zip((train_f, train_l, train_n)):
+        train_step(i, j, k)
         if n % 10 == 0:
             print('.', end='')
             n += 1
@@ -214,10 +229,11 @@ for epoch in range(EPOCHS):
         id = str(epoch)
         s = generator_s(f, training=False)
         i = generator_i(s, training=False)
-        n = generator_n(f, training=False)
+        fake_n = generator_n(f, training=False)
         gen = s + i + n
         test = identity_loss(s, l)
         gen_loss = identity_loss(gen, f)
+        noise_l = identity_loss(fake_n, n)
         print("_____Test Result:_____")
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
@@ -226,4 +242,5 @@ for epoch in range(EPOCHS):
                                                            time.time() - start))
         print('The generator total loss is', gen_loss)
         print('The signal loss is ', test)
+        print('The noise loss is', noise_l)
         print("___________________\n")
