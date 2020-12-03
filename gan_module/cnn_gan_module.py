@@ -124,7 +124,7 @@ def train_step(total, label):
         identity_g_loss = identity_loss(total, gen)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
-        total_n_loss = total_gen_loss + n_loss
+        total_n_loss = identity_g_loss + n_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
