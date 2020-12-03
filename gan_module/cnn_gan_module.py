@@ -73,6 +73,8 @@ def make_generator():
     model.add(layers.MaxPooling2D((1, 1)))
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
     model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
     model.add(layers.Dense(2))
     return model
 
