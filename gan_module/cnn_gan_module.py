@@ -121,7 +121,7 @@ def train_step(total, label, noise):
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
         gen_loss = generator_loss(fake_t)
-        n_loss = noise_loss(n)
+        n_loss = noise_loss(fake_n)
         fake_d = discriminator_d(s, training=True)
         real_d = discriminator_d(label, training=True)
         gen_s_loss = generator_loss(fake_d)
