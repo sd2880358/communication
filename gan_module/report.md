@@ -1,4 +1,5 @@
 # 12/6
+# LAMBDA = 50; EPOCHS=500;
 ## method 1 (constrain noise):
 
 - total_s_loss = identity_s + total_gen_loss
