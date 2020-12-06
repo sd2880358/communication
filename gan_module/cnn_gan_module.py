@@ -56,25 +56,26 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(32, (1, 1), activation='relu', input_shape=(1, 50, 2)))
+    model.add(layers.Conv2D(1, (2, 1), strides=(1, 1), padding='same',
+                            activation='relu', input_shape=(1, 50, 2)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     model.add(layers.MaxPooling2D((1, 1)))
-    model.add(layers.Conv2D(64, (1, 1), activation='relu'))
+    model.add(layers.Conv2D(2, (1, 1), activation='relu'))
     model.add(layers.MaxPooling2D((1, 1)))
-    model.add(layers.Conv2D(64, (1, 1), activation='relu'))
-    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Conv2D(100, (1, 1), activation='relu'))
+    model.add(layers.Dense(1, activation='relu'))
     model.add(layers.Dense(2))
     return model
 
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Reshape((50, 2, 1)))
-    model.add(layers.Conv2D(64, (2, 1), strides=(1, 1), padding='same',
+    model.add(layers.Conv2D(1, (2, 1), strides=(1, 1), padding='same',
                                      input_shape=[1, 50, 2]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
-    model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
+    model.add(layers.Conv2D(2, (5, 5), strides=(2, 2), padding='same'))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
 
