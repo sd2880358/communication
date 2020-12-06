@@ -20,7 +20,7 @@ def dataset(dataFile, labelFile):
     label_imag = my_labels['X'].imag
     noise = my_labels['N']
     interference = my_labels['L_Interference'][0]
-    myOrig = table_data(my_data, my_labels['L_Constellations'][0], X, interference, noise,
+    myOrig = table_data(my_data, my_labels['L_Constellations'][0], label, interference, noise,
                        label_real, label_imag)
     mytable = assign_label(myOrig)
     return mytable
