@@ -68,11 +68,11 @@ def make_generator():
 def make_discriminator_model():
     model = tf.keras.Sequential()
     model.add(layers.Reshape((50, 2, 1)))
-    model.add(layers.Conv2D(128, (2, 1), strides=(1, 1), padding='same',
+    model.add(layers.Conv2D(64, (2, 1), strides=(1, 1), padding='same',
                                      input_shape=[1, 50, 2]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
-    model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same'))
+    model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
 
@@ -120,8 +120,8 @@ def train_step(total, label, noise):
         identity_g_loss = identity_loss(total, gen)
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
-        total_s_loss = identity_s_loss + total_gen_loss + 1/2 * identity_g_loss
-        total_n_loss = total_gen_loss + identity_g_loss
+        total_s_loss = identity_g_loss + identity_s_loss + total_gen_loss
+        total_n_loss = identity_n_loss + total_gen_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
