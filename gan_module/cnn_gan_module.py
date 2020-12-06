@@ -227,6 +227,7 @@ for epoch in range(EPOCHS):
         gen_loss = identity_loss(gen, f)
         noise_l = identity_loss(fake_n, noise)
         print("_____Test Result:_____")
+        print(noise_loss(fake_n))
         '''
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
