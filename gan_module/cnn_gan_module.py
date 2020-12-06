@@ -58,6 +58,8 @@ def make_generator():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(32, (1, 1), activation='relu', input_shape=(1, 50, 2)))
     model.add(layers.MaxPooling2D((1, 1)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
     model.add(layers.MaxPooling2D((1, 1)))
     model.add(layers.BatchNormalization())

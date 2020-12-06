@@ -15,47 +15,44 @@ def dataset(dataFile, labelFile):
     my_data = sc.loadmat(dataFile)
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']
-    X = my_labels['L_S_x']
-    myOrig = table_data(my_data, my_labels['L_Constellations'][0], X)
+    label = my_labels['L_S_x']
+    label_real = my_labels['X'].real
+    label_imag = my_labels['X'].imag
+    noise = my_labels['N']
+    interference = my_labels['L_Interference'][0]
+    myOrig = table_data(my_data, my_labels['L_Constellations'][0], label, interference, noise,
+                       label_real, label_imag)
     mytable = assign_label(myOrig)
     return mytable
 
 
 def assign_label(data):
-    c_4 = [1,-1]
-    c_16 = [3,1,-1,-3]
-    c_16r = [-3,-1,1,3]
-    cons_4 = np.dot(np.sqrt(0.5),[complex(i,j)for i in c_4 for j in c_4])
-    cons_16 = np.array([complex(i,j)for j in c_16 for i in c_16r])
-    cons_16 = cons_16/np.sqrt(np.mean(np.abs(cons_16)**2))
-    cons4 = data[data.cons==1]
-    cons4_label = np.array([[cons_4[i-1]]for i in cons4.label])
-    cons16 = data[data.cons==2]
-    cons16_label = np.array([[cons_16[i-1]]for i in cons16.label.to_numpy().real.astype(int)])
-    data[data.cons==2].index
-    data['buffer'] = 0
-    data['buffer'] = 0
-    data.iloc[data[data.cons==1].index, 5] = cons4_label
-    data.iloc[data[data.cons==2].index, 5] = cons16_label
-    data['label_real'] = data.buffer.to_numpy().real
-    data['label_imag'] = data.buffer.to_numpy().imag
     myTest = data.copy()
     myTest.loc[myTest.cons == 2, 'label'] = myTest.loc[myTest.cons == 2, 'label'] + 4
     myTest.label = myTest.label - 1
     return myTest
 
 
-def table_data(my_data, cons, label):
+def table_data(my_data, cons, label, interference, noise, label_real, label_imag):
     block = my_data.shape[1]
     my_data_size = my_data.shape[0] * block
     my_data_div = my_data.T.reshape(my_data_size, )
+    label_real = label_real.T.reshape(my_data_size, )
+    label_imag = label_imag.T.reshape(my_data_size, )
+    noise = noise.T.reshape(my_data_size, )
     cons_array = np.array([[cons[i]] * my_data.shape[0] for i in range(0, block)]).reshape(my_data_size, )
     block_array = np.array([([i + 1] * my_data.shape[0]) for i in range(0, block)]).reshape(my_data_size, )
+    interference_array = np.array([[interference[i]] * my_data.shape[0]
+                               for i in range(0, block)]).reshape(my_data_size, )
     label_array = label.T.reshape(my_data_size, )
     test_pd = pd.DataFrame({'real': my_data_div.real, 'imag': my_data_div.imag,
                             'cons': cons_array, 'block': block_array,
-                            'label': label_array})
+                            'label': label_array,
+                           'interference':interference_array,
+                           'N_R': noise.real, 'N_I':noise.imag,
+                           'label_real': label_real, 'label_imag':label_imag})
     return test_pd
+
 
 def make_generator():
     model = tf.keras.Sequential()
