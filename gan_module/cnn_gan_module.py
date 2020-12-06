@@ -68,7 +68,7 @@ def make_generator():
 
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Dense(128, use_bias=False, input_shape=[50,2]))
+    model.add(layers.Dense(128, use_bias=False, input_shape=[1, 50,2]))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
     model.add(layers.Dense(128, activation='relu'))
