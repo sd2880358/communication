@@ -65,7 +65,7 @@ def make_generator():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
-    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(100, activation='relu'))
     model.add(layers.Dense(2))
     return model
 
