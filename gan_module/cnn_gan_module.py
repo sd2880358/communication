@@ -121,7 +121,7 @@ def train_step(total, label, noise):
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_s_loss
-        total_n_loss = identity_n_loss
+        total_n_loss = identity_n_loss + n_loss
         total_i_loss = identity_g_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -203,7 +203,7 @@ file_directory = './result/tes2/'
 f, labels, s, noise = shuffle_data(data)
 
 BUFFER_SIZE = 50
-BATCH_SIZE = 256
+BATCH_SIZE = 50
 train_f = tf.data.Dataset.from_tensor_slices(f).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
