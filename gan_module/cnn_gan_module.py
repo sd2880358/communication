@@ -200,12 +200,12 @@ data = "my_data"
 data_label = "my_labels"
 data = dataset(data, data_label)
 file_directory = './result/tes2/'
-f, l, s, noise = shuffle_data(data)
+f, labels, s, noise = shuffle_data(data)
 
 BUFFER_SIZE = 50
 BATCH_SIZE = 256
 train_f = tf.data.Dataset.from_tensor_slices(f).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-train_l = tf.data.Dataset.from_tensor_slices(l).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 for epoch in range(EPOCHS):
     start = time.time()
@@ -223,7 +223,7 @@ for epoch in range(EPOCHS):
         i = generator_i(s, training=False)
         fake_n = generator_n(f, training=False)
         gen = s + i + fake_n
-        test = identity_loss(s, l)
+        test = identity_loss(s, labels)
         gen_loss = identity_loss(gen, f)
         noise_l = identity_loss(fake_n, noise)
         print("_____Test Result:_____")
