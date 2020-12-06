@@ -230,9 +230,9 @@ for epoch in range(EPOCHS):
         i = generator_i(feature, training=False)
         fake_n = generator_n(feature, training=False)
         gen = s + i + fake_n
-        test = identity_loss(s, labels)
-        gen_loss = identity_loss(gen, feature)
-        noise_l = identity_loss(fake_n, noise)
+        test = tf.reduce_mean(tf.abs(s - labels))
+        gen_loss = tf.reduce_mean(tf.abs(gen - feature))
+        noise_l = tf.reduce_mean(tf.abs(noise - fake_n))
         print("_____Test Result:_____")
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
