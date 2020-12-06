@@ -120,7 +120,7 @@ def train_step(total, label, noise):
         identity_g_loss = identity_loss(total, gen)
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
-        total_s_loss = identity_s_loss + total_gen_loss
+        total_s_loss = identity_s_loss + total_gen_loss + identity_g_loss
         total_n_loss = total_gen_loss + identity_g_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
@@ -170,7 +170,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/method_4"
+checkpoint_path = "./checkpoints/method_2"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
                            generator_i=generator_i,
