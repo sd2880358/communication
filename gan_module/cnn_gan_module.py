@@ -120,7 +120,8 @@ def train_step(total, label, noise):
         identity_g_loss = identity_loss(total, gen)
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
-        total_s_loss = identity_s_loss + total_gen_loss
+        print(gen_s_loss)
+        total_s_loss = identity_s_loss + gen_s_loss
         total_n_loss = identity_n_loss + n_loss
         total_i_loss = identity_g_loss
 
@@ -200,11 +201,11 @@ data = "my_data"
 data_label = "my_labels"
 data = dataset(data, data_label)
 file_directory = './result/tes2/'
-f, labels, s, noise = shuffle_data(data)
+feature, labels, symbol, noise = shuffle_data(data)
 
 BUFFER_SIZE = 50
 BATCH_SIZE = 50
-train_f = tf.data.Dataset.from_tensor_slices(f).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+train_f = tf.data.Dataset.from_tensor_slices(feature).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 for epoch in range(EPOCHS):
@@ -219,12 +220,12 @@ for epoch in range(EPOCHS):
 
     if ((epoch + 1) % 5) == 0:
         id = str(epoch)
-        s = generator_s(f, training=False)
-        i = generator_i(f, training=False)
-        fake_n = generator_n(f, training=False)
+        s = generator_s(feature, training=False)
+        i = generator_i(feature, training=False)
+        fake_n = generator_n(feature, training=False)
         gen = s + i + fake_n
         test = identity_loss(s, labels)
-        gen_loss = identity_loss(gen, f)
+        gen_loss = identity_loss(gen, feature)
         noise_l = identity_loss(fake_n, noise)
         print("_____Test Result:_____")
         '''
