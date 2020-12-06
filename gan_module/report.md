@@ -44,6 +44,8 @@
 
 ### Result in 500 epochs:
 
-- total_loss = 0.009
-- signal_loss = 0.767
+- total_loss = 0.05
+- signal_loss = 0.782
 - noise_loss = 0.057
+
+
