@@ -58,8 +58,6 @@ def make_generator():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(128, (2, 1), strides=(1, 1), padding='same',
                             activation='relu', input_shape=(1, 50, 2)))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
     model.add(layers.MaxPooling2D((1, 1)))
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
     model.add(layers.MaxPooling2D((1, 1)))
@@ -172,7 +170,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/method_3"
+checkpoint_path = "./checkpoints/method_4"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
                            generator_i=generator_i,
