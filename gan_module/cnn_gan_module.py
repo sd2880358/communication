@@ -58,12 +58,8 @@ def make_generator():
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(32, (1, 1), activation='relu', input_shape=(1, 50, 2)))
     model.add(layers.MaxPooling2D((1, 1)))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
     model.add(layers.MaxPooling2D((1, 1)))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
     model.add(layers.Dense(2))
     return model
@@ -126,8 +122,6 @@ def train_step(total, label, noise):
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_s_loss + total_gen_loss
-        print("total_gen_loss", total_gen_loss)
-        print("total_s_loss", total_s_loss)
         total_n_loss = identity_n_loss + n_loss + total_gen_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
@@ -210,7 +204,7 @@ file_directory = './result/tes2/'
 feature, labels, symbol, noise = shuffle_data(data)
 
 BUFFER_SIZE = 50
-BATCH_SIZE = 50
+BATCH_SIZE = 250
 train_f = tf.data.Dataset.from_tensor_slices(feature).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
