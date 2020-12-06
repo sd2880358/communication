@@ -130,6 +130,6 @@ if VISUALIZE
 
 end
 
-save my_labels.mat L_Constellations L_Interference L_S_x L_S_i N
+save my_labels.mat L_Constellations L_Interference L_S_x L_S_i N X
 save my_decoder.mat S_hat_4 S_hat_16 SER_16 SER_4
 save my_data1.mat Y
