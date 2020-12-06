@@ -224,9 +224,11 @@ for epoch in range(EPOCHS):
         gen_loss = identity_loss(gen, f)
         noise_l = identity_loss(fake_n, noise)
         print("_____Test Result:_____")
+        '''
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
+        '''
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
         print('The generator total loss is', gen_loss)
