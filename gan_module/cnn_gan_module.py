@@ -56,7 +56,7 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(128, (2, 1), strides=(1, 1), padding='same',
+    model.add(layers.Conv2D(128, (1, 1), strides=(1, 1), padding='same',
                             activation='relu', input_shape=(1, 50, 2)))
     model.add(layers.MaxPooling2D((1, 1)))
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
