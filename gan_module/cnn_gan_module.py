@@ -56,8 +56,7 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator():
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(128, (1, 1), strides=(1, 1), padding='same',
-                            activation='relu', input_shape=(1, 50, 2)))
+    model.add(layers.Conv2D(128, (1, 1), activation='relu', input_shape=(1, 50, 2)))
     model.add(layers.MaxPooling2D((1, 1)))
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
     model.add(layers.MaxPooling2D((1, 1)))
@@ -170,6 +169,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
+'''
 checkpoint_path = "./checkpoints/method_2"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
@@ -188,6 +188,9 @@ ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
 if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
+    
+'''
+
 LAMBDA = 10
 EPOCHS = 500
 data = "my_data"
