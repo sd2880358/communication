@@ -65,7 +65,6 @@ def make_generator():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     model.add(layers.Conv2D(64, (1, 1), activation='relu'))
-    model.add(layers.Dense(100, activation='relu'))
     model.add(layers.Dense(2))
     return model
 
@@ -126,8 +125,8 @@ def train_step(total, label, noise):
         identity_g_loss = identity_loss(total, gen)
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
-        total_s_loss = identity_s_loss + total_gen_loss
-        total_n_loss = identity_n_loss + n_loss + total_gen_loss
+        total_s_loss = identity_s_loss + total_gen_loss + identity_g_loss
+        total_n_loss = identity_n_loss + n_loss + total_gen_loss + identity_g_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -178,7 +177,7 @@ generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-'''
+
 checkpoint_path = "./checkpoints/method_2"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
@@ -198,7 +197,7 @@ if ckpt_manager.latest_checkpoint:
     ckpt.restore(ckpt_manager.latest_checkpoint)
     print ('Latest checkpoint restored!!')
     
-'''
+
 
 LAMBDA = 10
 EPOCHS = 500
@@ -233,11 +232,10 @@ for epoch in range(EPOCHS):
         gen_loss = identity_loss(gen, feature)
         noise_l = identity_loss(fake_n, noise)
         print("_____Test Result:_____")
-        '''
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                             ckpt_save_path))
-        '''
+
         print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                            time.time() - start))
         print('The generator total loss is', gen_loss)
