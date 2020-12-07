@@ -55,11 +55,11 @@
 
 ### Result in 500 epochs:
 
-- total_loss = 0.016
-- signal_loss = 0.763
-- noise_loss = 0.057
+- total_loss = 0.011
+- signal_loss = 0.761
+- noise_loss = 0.058
 
-## method 6 (without constrain noise, lambda = 60):
+## method 6 (without constrain noise, lambda = 150):
 - total_s_loss = identity_s + total_gen_loss
 - total_n_loss = total_gen_loss + identity_n_loss + n_loss
 - total_i_loss = identity_g_loss + total_gen_loss
