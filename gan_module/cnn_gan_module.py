@@ -196,7 +196,7 @@ if ckpt_manager.latest_checkpoint:
 
 
 LAMBDA = 50
-EPOCHS = 30
+EPOCHS = 500
 data = "my_data"
 data_label = "my_labels"
 data = dataset(data, data_label)
@@ -224,9 +224,9 @@ for epoch in range(EPOCHS):
         i = generator_i(feature, training=False)
         fake_n = generator_n(feature, training=False)
         gen = s + i + fake_n
-        test = tf.reduce_mean(tf.abs(s - labels))
-        gen_loss = tf.reduce_mean(tf.abs(gen - feature))
-        noise_l = tf.reduce_mean(tf.abs(noise - fake_n))
+        test = abs(s - labels).numpy().mean()
+        gen_loss = abs(gen - feature).numpy().mean()
+        noise_l = abs(noise - fake_n).numpy().mean()
         print("_____Test Result:_____")
         ckpt_save_path = ckpt_manager.save()
         print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
