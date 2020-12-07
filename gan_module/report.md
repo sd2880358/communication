@@ -52,12 +52,15 @@
 - total_s_loss = identity_s + total_gen_loss
 - total_n_loss = total_gen_loss + identity_n_loss + n_loss
 - total_i_loss = identity_g_loss + total_gen_loss
+- fake_total - features = 0.22
 
 ### Result in 500 epochs:
 
 - total_loss = 0.011
 - signal_loss = 0.761
 - noise_loss = 0.058
+
+CNN_model = 0.66
 
 ## method 6 (constrain noise, lambda = 150):
 - total_s_loss = identity_s + total_gen_loss
@@ -70,7 +73,7 @@
 - signal_loss = 0.767
 - noise_loss = 0.057
 
-## method 7 (constrain noise, lambda = 100, epochs=100):
+## method 7 (constrain noise, lambda = 150, epochs=100):
 - total_s_loss = identity_s + total_gen_loss
 - total_n_loss = total_gen_loss + identity_n_loss + n_loss
 - total_i_loss = identity_g_loss + total_gen_loss
@@ -81,15 +84,16 @@
 - signal_loss = 0.74
 - noise_loss = 0.057
 
-## method 8 (constrain noise, lambda = 50):
+## method 8 (noise, lambda = 100, epochs=40):
 - total_s_loss = identity_s + total_gen_loss
 - total_n_loss = total_gen_loss + identity_n_loss + n_loss
 - total_i_loss = identity_g_loss + total_gen_loss
 
 ### Result in 500 epochs:
 
-- total_loss = 0.08
-- signal_loss = 0.69
-- noise_loss = 0.057
-using cnn model, and acc = 0.20;
+- total_loss = 0.03
+- signal_loss = 0.70
+- noise_loss = 0.058
+- fake_total - features = 0.26
+using cnn model, and acc = 0.86;
 

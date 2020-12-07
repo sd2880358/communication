@@ -13,8 +13,8 @@ from tensorflow.keras.layers.experimental import preprocessing
 
 
 def dataset(dataFile, labelFile):
-    dataFile = "./communication/" + dataFile
-    labelFile = "./communication/" + labelFile
+    dataFile = "../ML_Symbol_Gen-main/" + dataFile
+    labelFile = "../ML_Symbol_Gen-main/" + labelFile
     my_data = sc.loadmat(dataFile)
     my_labels = sc.loadmat(labelFile)
     my_data = my_data['Y']
@@ -232,5 +232,8 @@ def cross_test(train_set, test_set, ori, cross, test_result):
     test_result = test_result.append(result)
     return [ori, cross, test_result]
 
-
-
+data = "my_data"
+label = "my_labels"
+test_data = dataset(data, label)
+test, result = get_train(test_data, 10)
+print(result)
