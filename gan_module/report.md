@@ -21,7 +21,7 @@
 ### Result in 500 epochs:
 
 - total_loss = 0.011
-- signal_loss = 0.768
+- signal_loss = 0.766
 - noise_loss = 0.058 
 
 
