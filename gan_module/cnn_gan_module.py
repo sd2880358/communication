@@ -195,7 +195,7 @@ if ckpt_manager.latest_checkpoint:
     
 
 
-LAMBDA = 50
+LAMBDA = 100
 EPOCHS = 500
 data = "my_data"
 data_label = "my_labels"
