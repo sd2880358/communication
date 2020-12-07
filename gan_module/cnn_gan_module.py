@@ -198,7 +198,7 @@ if ckpt_manager.latest_checkpoint:
 
 
 LAMBDA = 100
-EPOCHS = 40
+EPOCHS = 120
 data = "my_data"
 data_label = "my_labels"
 data = dataset(data, data_label)
