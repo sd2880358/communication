@@ -77,9 +77,9 @@
 
 ### Result in 500 epochs:
 
-- total_loss = 0.056
-- signal_loss = 0.723
-- noise_loss = 0.058
+- total_loss = 0.03
+- signal_loss = 0.74
+- noise_loss = 0.057
 
 ## method 8 (constrain noise, lambda = 50):
 - total_s_loss = identity_s + total_gen_loss
