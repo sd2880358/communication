@@ -8,9 +8,9 @@
 - total_n_loss = total_gen_loss + identity_g_loss
 - total_i_loss = identity_g_loss + total_gen_loss
 ### Result in 500 epochs:
-- total_loss = 0.015
-- signal_loss = 0.769
-- noise_loss = 0.153
+- total_loss = 0.0047
+- signal_loss = 0.79
+- noise_loss = 0.0856
 
 ## method 2 (constrain noise):
 
