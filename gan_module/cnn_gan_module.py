@@ -106,7 +106,7 @@ def train_step(total, label, noise):
     with tf.GradientTape(persistent=True) as tape:
         s = generator_s(total, training=True)
         fake_n = generator_n(total, training=True)
-        i = generator_i(total, training=True)
+        i = generator_i(s, training=True)
         gen = (s + fake_n + i)
         fake_t = discriminator_t(gen, training=True)
         real_t = discriminator_t(total, training=True)
@@ -174,7 +174,7 @@ discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
 
-checkpoint_path = "./checkpoints/method_3"
+checkpoint_path = "./checkpoints/method_4"
 ckpt = tf.train.Checkpoint(generator_s=generator_s,
                            generator_n=generator_n,
                            generator_i=generator_i,
@@ -221,7 +221,7 @@ for epoch in range(EPOCHS):
     if ((epoch + 1) % 5) == 0:
         id = str(epoch)
         s = generator_s(feature, training=False)
-        i = generator_i(feature, training=False)
+        i = generator_i(s, training=False)
         fake_n = generator_n(feature, training=False)
         gen = s + i + fake_n
         test = abs(s - labels).numpy().mean()
