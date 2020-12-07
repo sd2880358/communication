@@ -97,9 +97,13 @@ CNN_model = 0.66
 - fake_total - features = 0.26
 using cnn model, and acc = 0.86;
 
-## method 9 (lambda = 100, epochs = 100)
+## method 9 (lambda = 100, epochs = 160)
 
 - total_s_loss = identity_s_loss + total_gen_loss + 0.5 * identity_g_loss
 - total_n_loss = total_gen_loss + identity_n_loss + n_loss + 0.5 * identity_g_loss
 - total_i_loss = identity_g_loss + total_gen_loss
 
+- total_loss = 0.03
+- signal_loss = 0.16
+- noise_loss = 0.058
+- fake_total - features = 0.26
