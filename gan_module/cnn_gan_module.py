@@ -103,40 +103,7 @@ def noise_loss(noise_output):
     return mean_abs_loss(0, noise_output) * LAMBDA
 
 
-@tf.function
-def train_step(total, label, noise):
-    with tf.GradientTape(persistent=True) as tape:
-        s = generator_s(total, training=True)
-        fake_n = generator_n(total, training=True)
-        i = generator_i(total, training=True)
-        gen = (s + fake_n + i)
-        fake_t = discriminator_t(gen, training=True)
-        real_t = discriminator_t(total, training=True)
-        gen_loss = generator_loss(fake_t)
-        n_loss = noise_loss(fake_n)
-        fake_d = discriminator_d(s, training=True)
-        real_d = discriminator_d(label, training=True)
-        gen_s_loss = generator_loss(fake_d)
-        disc_t_loss = discriminator_loss(real_t, fake_t)
-        disc_d_loss = discriminator_loss(real_d, fake_d)
-        identity_s_loss = identity_loss(label, s)
-        identity_g_loss = identity_loss(total, gen)
-        identity_n_loss = identity_loss(noise, fake_n)
-        total_gen_loss = 1/2 * gen_s_loss + gen_loss
-        total_s_loss = identity_s_loss + total_gen_loss + 0.5 * identity_g_loss
-        total_n_loss = total_gen_loss + n_loss + identity_n_loss
-        total_i_loss = identity_g_loss + total_gen_loss
 
-    gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
-    gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
-    gradients_of_n_generator = tape.gradient(total_n_loss, generator_n.trainable_variables)
-    gradients_of_discriminator_t = tape.gradient(disc_t_loss, discriminator_t.trainable_variables)
-    gradients_of_discriminator_d = tape.gradient(disc_d_loss, discriminator_d.trainable_variables)
-    generator_s_optimizer.apply_gradients(zip(gradients_of_s_generator, generator_s.trainable_variables))
-    generator_i_optimizer.apply_gradients(zip(gradients_of_i_generator, generator_i.trainable_variables))
-    generator_n_optimizer.apply_gradients(zip(gradients_of_n_generator, generator_n.trainable_variables))
-    discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
-    discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
 def shuffle_data(my_table, blockSize):
     '''
@@ -163,6 +130,40 @@ def shuffle_data(my_table, blockSize):
 
 
 def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
+    @tf.function
+    def train_step(total, label, noise):
+        with tf.GradientTape(persistent=True) as tape:
+            s = generator_s(total, training=True)
+            fake_n = generator_n(total, training=True)
+            i = generator_i(total, training=True)
+            gen = (s + fake_n + i)
+            fake_t = discriminator_t(gen, training=True)
+            real_t = discriminator_t(total, training=True)
+            gen_loss = generator_loss(fake_t)
+            n_loss = noise_loss(fake_n)
+            fake_d = discriminator_d(s, training=True)
+            real_d = discriminator_d(label, training=True)
+            gen_s_loss = generator_loss(fake_d)
+            disc_t_loss = discriminator_loss(real_t, fake_t)
+            disc_d_loss = discriminator_loss(real_d, fake_d)
+            identity_s_loss = identity_loss(label, s)
+            identity_g_loss = identity_loss(total, gen)
+            identity_n_loss = identity_loss(noise, fake_n)
+            total_gen_loss = 1/2 * gen_s_loss + gen_loss
+            total_s_loss = identity_s_loss + total_gen_loss + 0.5 * identity_g_loss
+            total_n_loss = total_gen_loss + n_loss + identity_n_loss
+            total_i_loss = identity_g_loss + total_gen_loss
+
+        gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
+        gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
+        gradients_of_n_generator = tape.gradient(total_n_loss, generator_n.trainable_variables)
+        gradients_of_discriminator_t = tape.gradient(disc_t_loss, discriminator_t.trainable_variables)
+        gradients_of_discriminator_d = tape.gradient(disc_d_loss, discriminator_d.trainable_variables)
+        generator_s_optimizer.apply_gradients(zip(gradients_of_s_generator, generator_s.trainable_variables))
+        generator_i_optimizer.apply_gradients(zip(gradients_of_i_generator, generator_i.trainable_variables))
+        generator_n_optimizer.apply_gradients(zip(gradients_of_n_generator, generator_n.trainable_variables))
+        discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
+        discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
     checkpoint_path = "./checkpoints/test/12_12/" + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
@@ -222,7 +223,6 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "noise_loss": noise_l,
                 "noise_relative_loss": noise_relative
             }, index=[0])
-            print(data)
             data.to_csv("./result/"+filePath)
 
 
@@ -230,8 +230,12 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 if __name__ == '__main__':
     LAMBDA = 100
     EPOCHS = 200
-
-    for i in range(1,11):
+    generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+    generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+    generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+    discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+    discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+    for i in range(2,11):
         blockSize = i*10
         i = str(i)
         data = "my_data" + i         
@@ -242,10 +246,5 @@ if __name__ == '__main__':
         generator_i = make_generator(blockSize)
         discriminator_t = make_discriminator_model(blockSize)
         discriminator_d = make_discriminator_model(blockSize)
-        generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-        generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-        generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-        discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-        discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
         data_table = dataset(data, data_label)
         start_train(250, blockSize, data_table, file_directory)
