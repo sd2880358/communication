@@ -191,7 +191,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('.', end='')
             n += 1
 
-        if epoch % 5 == 0:
+        if epoch == EPOCHS-1:
             s = generator_s(feature, training=False)
             i = generator_i(feature, training=False)
             fake_n = generator_n(feature, training=False)
@@ -200,8 +200,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             gen_loss = abs(gen - feature).numpy().mean()
             noise_l = abs(noise - fake_n).numpy().mean()
             noise_relative = noise_l / noise.numpy().mean()
-            test_relative = test / s.numpy().mean()
-            gen_relative = gen_loss / gen.numpy().mean()
+            test_relative = test / labels.numpy().mean()
+            gen_relative = gen_loss / feature.numpy().mean()
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
