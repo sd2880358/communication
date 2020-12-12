@@ -229,9 +229,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 if __name__ == '__main__':
     LAMBDA = 100
-    EPOCHS = 5
+    EPOCHS = 200
 
-    for i in range(1,2):
+    for i in range(1,11):
         blockSize = i*10
         i = str(i)
         data = "my_data" + i         
