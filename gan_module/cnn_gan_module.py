@@ -153,7 +153,6 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             total_s_loss = identity_s_loss + total_gen_loss + 0.5 * identity_g_loss
             total_n_loss = total_gen_loss + n_loss + identity_n_loss
             total_i_loss = identity_g_loss + total_gen_loss
-
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
         gradients_of_n_generator = tape.gradient(total_n_loss, generator_n.trainable_variables)
@@ -192,7 +191,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('.', end='')
             n += 1
 
-        if epoch == EPOCHS-1:
+        if epoch % 5 == 0:
             s = generator_s(feature, training=False)
             i = generator_i(feature, training=False)
             fake_n = generator_n(feature, training=False)
