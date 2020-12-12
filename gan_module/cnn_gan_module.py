@@ -235,7 +235,7 @@ if __name__ == '__main__':
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    for i in range(2,11):
+    for i in range(1,11):
         blockSize = i*10
         i = str(i)
         data = "my_data" + i         
