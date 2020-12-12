@@ -54,9 +54,9 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
     return test_pd
 
 
-def make_generator():
+def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (1, 1), activation='relu', input_shape=(1, 50, 2)))
+    model.add(layers.Conv2D(16, (1, 1), activation='relu', input_shape=(1, blockSize, 2)))
     model.add(layers.MaxPooling2D(1,1))
     model.add(layers.Conv2D(32, 3, padding='same', activation='relu'))
     model.add(layers.MaxPooling2D(1,1))
@@ -68,11 +68,11 @@ def make_generator():
 
 
 
-def make_discriminator_model():
+def make_discriminator_model(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Reshape((50, 2, 1)))
+    model.add(layers.Reshape((blockSize, 2, 1)))
     model.add(layers.Conv2D(64, (2, 1), strides=(1, 1), padding='same',
-                                     input_shape=[1, 50, 2]))
+                                     input_shape=[1, blockSize, 2]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
     model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
@@ -124,7 +124,7 @@ def train_step(total, label, noise):
         identity_n_loss = identity_loss(noise, fake_n)
         total_gen_loss = 1/2 * gen_s_loss + gen_loss
         total_s_loss = identity_s_loss + total_gen_loss + 0.5 * identity_g_loss
-        total_n_loss = total_gen_loss + identity_g_loss
+        total_n_loss = total_gen_loss + n_loss + identity_n_loss
         total_i_loss = identity_g_loss + total_gen_loss
 
     gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -138,7 +138,7 @@ def train_step(total, label, noise):
     discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
     discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
-def shuffle_data(my_table):
+def shuffle_data(my_table, blockSize):
     '''
     real_y = (2*my_table.real.min())/(my_table.real.max() - my_table.real.min()) + 1
     real_x = (my_table.real.max()) / (1 + real_y)
@@ -153,91 +153,99 @@ def shuffle_data(my_table):
     test_feature = tf.cast(train_feature, tf.float32)
     test_label = tf.cast(train_label, tf.float32)
     test_noise = tf.cast(noise, tf.float32)
-    block = int(test_feature.shape[0]/50)
-    test_feature = tf.reshape(test_feature,(block,1,50,2))
-    test_label = tf.reshape(test_label, (block,1,50,2))
-    test_noise = tf.reshape(test_noise, (block, 1,50,2))
+    block = int(test_feature.shape[0]/blockSize)
+    test_feature = tf.reshape(test_feature,(block,1,blockSize,2))
+    test_label = tf.reshape(test_label, (block,1,blockSize,2))
+    test_noise = tf.reshape(test_noise, (block, 1,blockSize,2))
     symbol = my_table.loc[:, 'label']
-    symbol = tf.reshape(symbol, (block,1, 50))
+    symbol = tf.reshape(symbol, (block,1, blockSize))
     return test_feature, test_label, symbol, test_noise
 
-generator_s = make_generator()
-generator_n = make_generator()
-generator_i = make_generator()
-discriminator_t = make_discriminator_model()
-discriminator_d = make_discriminator_model()
 
-
-generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-
-discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-
-
-checkpoint_path = "./checkpoints/method_10"
-ckpt = tf.train.Checkpoint(generator_s=generator_s,
-                           generator_n=generator_n,
-                           generator_i=generator_i,
-                           discriminator_t=discriminator_t,
-                           discriminator_d=discriminator_d,
-                           generator_s_optimizer=generator_s_optimizer,
-                           generator_n_optimizer=generator_n_optimizer,
-                           generator_i_optimizer=generator_i_optimizer,
-                           discriminator_d_optimizer=discriminator_d_optimizer,
-                           discriminator_t_optimizer=discriminator_t_optimizer)
-
-ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
-
-# if a checkpoint exists, restore the latest checkpoint.
-if ckpt_manager.latest_checkpoint:
-    ckpt.restore(ckpt_manager.latest_checkpoint)
-    print ('Latest checkpoint restored!!')
-    
-
-
-LAMBDA = 100
-EPOCHS = 120
-data = "my_data"
-data_label = "my_labels"
-data = dataset(data, data_label)
-file_directory = './result/tes2/'
-feature, labels, symbol, noise = shuffle_data(data)
-
-BUFFER_SIZE = 50
-BATCH_SIZE = 250
-train_f = tf.data.Dataset.from_tensor_slices(feature).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-for epoch in range(EPOCHS):
-    start = time.time()
-    n = 0
-    for i, j, k in tf.data.Dataset.zip((train_f, train_l, train_n)):
-        train_step(i, j, k)
+def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
+    checkpoint_path = "./checkpoints/test/12_12/" + filePath
+    ckpt = tf.train.Checkpoint(generator_s=generator_s,
+                               generator_n=generator_n,
+                               generator_i=generator_i,
+                               discriminator_t=discriminator_t,
+                               discriminator_d=discriminator_d,
+                               generator_s_optimizer=generator_s_optimizer,
+                               generator_n_optimizer=generator_n_optimizer,
+                               generator_i_optimizer=generator_i_optimizer,
+                               discriminator_d_optimizer=discriminator_d_optimizer,
+                               discriminator_t_optimizer=discriminator_t_optimizer)
+    ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
+    if ckpt_manager.latest_checkpoint:
+        ckpt.restore(ckpt_manager.latest_checkpoint)
+        print('Latest checkpoint restored!!')
+    feature, labels, symbol, noise = shuffle_data(data, BUFFER_SIZE)
+    train_f = tf.data.Dataset.from_tensor_slices(feature).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+    train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+    train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+    for epoch in range(EPOCHS):
+        start = time.time()
+        n = 0
+        for i, j, k in tf.data.Dataset.zip((train_f, train_l, train_n)):
+            train_step(i, j, k)
         if n % 10 == 0:
             print('.', end='')
             n += 1
 
+        if epoch == EPOCHS-1:
+            s = generator_s(feature, training=False)
+            i = generator_i(feature, training=False)
+            fake_n = generator_n(feature, training=False)
+            gen = s + i + fake_n
+            test = abs(s - labels).numpy().mean()
+            gen_loss = abs(gen - feature).numpy().mean()
+            noise_l = abs(noise - fake_n).numpy().mean()
+            noise_relative = noise_l / noise.numpy().mean()
+            test_relative = test / s.numpy().mean()
+            gen_relative = gen_loss / gen.numpy().mean()
+            print("_____Test Result:_____")
+            ckpt_save_path = ckpt_manager.save()
+            print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
+                                                        ckpt_save_path))
 
-    if ((epoch + 1) % 5) == 0:
-        id = str(epoch)
-        s = generator_s(feature, training=False)
-        i = generator_i(feature, training=False)
-        fake_n = generator_n(feature, training=False)
-        gen = s + i + fake_n
-        test = abs(s - labels).numpy().mean()
-        gen_loss = abs(gen - feature).numpy().mean()
-        noise_l = abs(noise - fake_n).numpy().mean()
-        print("_____Test Result:_____")
-        ckpt_save_path = ckpt_manager.save()
-        print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
-                                                            ckpt_save_path))
+            print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
+                                                       time.time() - start))
+            print('The generator total loss is', gen_loss)
+            print('The signal loss is ', test)
+            print("the noise loss is", noise_loss(fake_n))
+            print('The noise iden_loss is', noise_l)
+            print("___________________\n")
+            data = pd.DataFrame({
+                "gen_loss": gen_loss,
+                "gen_relative_loss": gen_relative,
+                "signal_loss": test,
+                "signal_relative_loss": test_relative,
+                "noise_loss": noise_l,
+                "noise_relative_loss": noise_relative
+            }, index=[0])
+            print(data)
+            data.to_csv("./result/"+filePath)
 
-        print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
-                                                           time.time() - start))
-        print('The generator total loss is', gen_loss)
-        print('The signal loss is ', test)
-        print("the noise loss is", noise_loss(fake_n))
-        print('The noise iden_loss is', noise_l)
-        print("___________________\n")
+
+
+if __name__ == '__main__':
+    LAMBDA = 100
+    EPOCHS = 5
+
+    for i in range(1,2):
+        blockSize = i*10
+        i = str(i)
+        data = "my_data" + i         
+        data_label = "my_labels" + i
+        file_directory = 'method' + i
+        generator_s = make_generator(blockSize)
+        generator_n = make_generator(blockSize)
+        generator_i = make_generator(blockSize)
+        discriminator_t = make_discriminator_model(blockSize)
+        discriminator_d = make_discriminator_model(blockSize)
+        generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+        generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+        generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+        discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+        discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+        data_table = dataset(data, data_label)
+        start_train(250, blockSize, data_table, file_directory)
