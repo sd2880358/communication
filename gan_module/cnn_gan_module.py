@@ -56,13 +56,13 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (1, 1), activation='relu', input_shape=(1, blockSize, 2)))
-    model.add(layers.MaxPooling2D(1,1))
-    model.add(layers.Conv2D(32, 3, padding='same', activation='relu'))
-    model.add(layers.MaxPooling2D(1,1))
-    model.add(layers.Conv2D(64, 3, padding='same', activation='relu'))
-    model.add(layers.MaxPooling2D(1,1))
-    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Conv2D(16, (1, 1), activation='relu',input_shape=(1, blockSize, 2)))
+    model.add(layers.MaxPool2D(1,1))
+    model.add(layers.Conv2D(32, 3, padding='same'))
+    model.add(layers.MaxPool2D(1, 1))
+    model.add(layers.Conv2D(64, 3, activation='relu',padding='same'))
+    model.add(layers.MaxPool2D(1, 1))
+    model.add(layers.Dense(32, activation="relu"))
     model.add(layers.Dense(2))
     return model
 
@@ -96,7 +96,7 @@ def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
 def identity_loss(real, fake):
-    loss = mean_abs_loss(real, fake)
+    loss = tf.reduced_mean(real, fake)
     return LAMBDA * 0.5 * loss
 
 def noise_loss(noise_output):
@@ -163,7 +163,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         generator_n_optimizer.apply_gradients(zip(gradients_of_n_generator, generator_n.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
-    checkpoint_path = "./checkpoints/test/12_12/" + filePath
+    checkpoint_path = "./checkpoints/test0/12_12/" + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
                                generator_i=generator_i,
@@ -185,12 +185,13 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
     for epoch in range(EPOCHS):
         start = time.time()
         n = 0
+        '''
         for i, j, k in tf.data.Dataset.zip((train_f, train_l, train_n)):
             train_step(i, j, k)
         if n % 10 == 0:
             print('.', end='')
             n += 1
-
+        '''
         if epoch == EPOCHS-1:
             s = generator_s(feature, training=False)
             i = generator_i(feature, training=False)
@@ -199,9 +200,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             test = abs(s - labels).numpy().mean()
             gen_loss = abs(gen - feature).numpy().mean()
             noise_l = abs(noise - fake_n).numpy().mean()
-            noise_relative = noise_l / noise.numpy().mean()
-            test_relative = test / labels.numpy().mean()
-            gen_relative = gen_loss / feature.numpy().mean()
+            noise_relative =np.median(abs((noise-fake_n)/noise))
+            test_relative =np.median(abs((s - labels)/labels))
+            gen_relative = np.median(abs((gen-feature)/feature))
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
@@ -228,7 +229,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 if __name__ == '__main__':
     LAMBDA = 100
-    EPOCHS = 200
+    EPOCHS = 1
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)

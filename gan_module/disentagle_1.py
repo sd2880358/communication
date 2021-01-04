@@ -213,7 +213,7 @@ for epoch in range(EPOCHS):
         cf_ori, test_result = mt.get_train(mlcData, 20)
         if not os.path.exists(file_directory):
             os.makedirs(file_directory)
-        cf_ori.to_csv(file_directory + '/test' + id, index=False)
+        cf_ori.to_csv(file_directory + '/test0' + id, index=False)
         cf_new = mt.batch_result(cf_ori)
         cf_new.to_csv(file_directory + '/batch' + id, index=False)
         test_result = pd.DataFrame(test_result)

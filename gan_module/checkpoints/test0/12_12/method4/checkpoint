@@ -1,0 +1,12 @@
+model_checkpoint_path: "ckpt-7"
+all_model_checkpoint_paths: "ckpt-3"
+all_model_checkpoint_paths: "ckpt-4"
+all_model_checkpoint_paths: "ckpt-5"
+all_model_checkpoint_paths: "ckpt-6"
+all_model_checkpoint_paths: "ckpt-7"
+all_model_checkpoint_timestamps: 1607818061.497097
+all_model_checkpoint_timestamps: 1607818303.0646029
+all_model_checkpoint_timestamps: 1607818345.437674
+all_model_checkpoint_timestamps: 1607818404.986911
+all_model_checkpoint_timestamps: 1607818666.786381
+last_preserved_timestamp: 1607816100.3108819
