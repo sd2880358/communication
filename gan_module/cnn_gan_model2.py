@@ -56,23 +56,21 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (1, 1), strides=(1,1), activation="linear", input_shape=(1, blockSize, 3)))
-    model.add(layers.AveragePooling2D((1,1), strides=(1,1)))
-    model.add(layers.Conv2D(32, 3, activation="linear", padding='same'))
-    model.add(layers.AveragePooling2D((1,1), strides=(1,1)))
-    model.add(layers.Conv2D(64, 3, activation="linear", padding='same'))
-    model.add(layers.AveragePooling2D((1,1), strides=(1,1)))
-    model.add(layers.Dense(32, activation="linear"))
-    model.add(layers.Dense(2))
+    model.add(layers.Conv2D(16, (1, 3), strides=(1,3), activation="linear",
+                            input_shape=(blockSize, 3, 1)))
+    model.add(layers.Conv2D(32, (1,16), activation="linear", padding='same'))
+    model.add(layers.Conv2D(16, (1,32), activation="linear", padding='same'))
+    model.add(layers.Reshape((blockSize, 16, 1)))
+    model.add(layers.AveragePooling2D((1,8)))
+    model.add(layers.Dense(1))
     return model
 
 
 
 def make_discriminator_model(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Reshape((blockSize, 2, 1)))
     model.add(layers.Conv2D(64, (2, 1), strides=(1, 1), padding='same',
-                                     input_shape=[1, blockSize, 2]))
+                                     input_shape=(blockSize, 2, 1)))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
     model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
@@ -120,11 +118,11 @@ def shuffle_data(my_table, blockSize):
     test_label = tf.cast(train_label, tf.float32)
     test_noise = tf.cast(noise, tf.float32)
     block = int(test_feature.shape[0]/blockSize)
-    test_feature = tf.reshape(test_feature,(block,1,blockSize,3))
-    test_label = tf.reshape(test_label, (block,1,blockSize,2))
-    test_noise = tf.reshape(test_noise, (block, 1,blockSize,2))
+    test_feature = tf.reshape(test_feature,(block,blockSize,3,1))
+    test_label = tf.reshape(test_label, (block,blockSize,2,1))
+    test_noise = tf.reshape(test_noise, (block,blockSize,2,1))
     symbol = my_table.loc[:, 'label']
-    symbol = tf.reshape(symbol, (block,1, blockSize))
+    symbol = tf.reshape(symbol, (block, blockSize, 1))
     return test_feature, test_label, symbol, test_noise
 
 def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
@@ -135,7 +133,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_n = generator_n(total, training=True)
             i = generator_i(total, training=True)
             gen = (s + fake_n + i)
-            real_feature = total[:, :, :, :2]
+            real_feature = total[:, :, :2, :]
             fake_t = discriminator_t(gen, training=True)
             real_t = discriminator_t(real_feature, training=True)
             gen_loss = generator_loss(fake_t)
@@ -162,7 +160,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         generator_n_optimizer.apply_gradients(zip(gradients_of_n_generator, generator_n.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
-    checkpoint_path = "./checkpoints/test1/01_03/" + filePath
+    checkpoint_path = "./checkpoints/test1/01_04/" + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
                                generator_i=generator_i,
@@ -195,7 +193,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_n = generator_n(feature, training=False)
             gen = s + i + fake_n
             test = abs(s - labels).numpy().mean()
-            real_feature = feature[:,:,:,:2]
+            real_feature = feature[:,:,:2,:]
             gen_loss = abs(gen - real_feature).numpy().mean()
             noise_l = abs(noise - fake_n).numpy().mean()
             noise_relative =np.median(abs((noise-fake_n)/noise))
@@ -220,13 +218,13 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "noise_loss": noise_l,
                 "noise_relative_loss": noise_relative
             }, index=[0])
-            data.to_csv("./result/test_1_03"+filePath)
+            data.to_csv("./result/test_1_04"+filePath)
 
 
 
 if __name__ == '__main__':
     LAMBDA = 100
-    EPOCHS = 150
+    EPOCHS = 5
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
