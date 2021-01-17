@@ -147,7 +147,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             identity_g_loss = identity_loss(real_feature, gen)
             identity_n_loss = identity_loss(noise, fake_n)
             total_gen_loss = 1/2 * gen_s_loss + gen_loss
-            total_s_loss = identity_s_loss * 2 + total_gen_loss + 0.5
+            total_s_loss = identity_s_loss + total_gen_loss + 0.5
             total_n_loss = total_gen_loss + n_loss + identity_n_loss
             total_i_loss = identity_g_loss + total_gen_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -160,7 +160,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         generator_n_optimizer.apply_gradients(zip(gradients_of_n_generator, generator_n.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
-    checkpoint_path = "./checkpoints/test1/01_04/" + filePath
+    checkpoint_path = "./checkpoints/test1/01_17/" + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
                                generator_i=generator_i,
@@ -218,7 +218,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "noise_loss": noise_l,
                 "noise_relative_loss": noise_relative
             }, index=[0])
-            data.to_csv("./result/test_1_04"+filePath)
+            data.to_csv("./result/test_1_17/"+filePath)
 
 
 
@@ -230,12 +230,12 @@ if __name__ == '__main__':
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    for i in range(1,11):
+    for i in range(10,11):
         blockSize = i*10
         i = str(i)
-        data = "my_data" + i
-        data_label = "my_labels" + i
-        file_directory = 'method' + i
+        data = "my_data"
+        data_label = "my_labels"
+        file_directory = 'method'
         generator_s = make_generator(blockSize)
         generator_n = make_generator(blockSize)
         generator_i = make_generator(blockSize)
