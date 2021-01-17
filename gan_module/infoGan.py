@@ -120,7 +120,7 @@ def noise_loss(noise_output):
 
 
 def cat_loss(c_label, c_output):
-    return categorical_loss(c_label, c_output) * 1000
+    return categorical_loss(c_label, c_output)
 
 def shuffle_data(my_table, blockSize):
     '''
