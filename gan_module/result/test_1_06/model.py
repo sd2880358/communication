@@ -56,21 +56,24 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (1, 3), strides=(1,3), activation="linear",
-                            input_shape=(blockSize, 3, 1)))
-    model.add(layers.Conv2D(32, (1,16), activation="linear", padding='same'))
-    model.add(layers.Conv2D(16, (1,32), activation="linear", padding='same'))
+    model.add(layers.Conv2D(16, (1, 3), strides=(1, 3), activation="linear",
+                                input_shape=(blockSize, 3, 1)))
+    model.add(layers.Conv2D(32, (1, 16), activation="linear", padding='same'))
+    model.add(layers.Conv2D(16, (1, 32), activation="linear", padding='same'))
     model.add(layers.Reshape((blockSize, 16, 1)))
-    model.add(layers.AveragePooling2D((1,8)))
+    model.add(layers.AveragePooling2D((1, 8)))
     model.add(layers.Dense(1))
     return model
 
-def noise_generator(blockSize):
+
+def mlp_generator(blockSize):
     model = tf.keras.Sequential()
     model.add(layers.Reshape((blockSize,3), input_shape=(blockSize, 3)))
-    model.add(layers.Dense(32,  activation="linear"))
-    model.add(layers.Dense(16, activation="linear"))
+    model.add(layers.Dense(16,  activation="linear"))
     model.add(layers.Dense(32, activation="linear"))
+    model.add(layers.Dense(64, activation="linear"))
+    model.add(layers.Dense(32, activation="linear"))
+    model.add(layers.Dense(16, activation="linear"))
     model.add(layers.Dense(2))
     model.add(layers.Reshape((blockSize,2,1)))
     return model
@@ -156,7 +159,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             identity_g_loss = identity_loss(real_feature, gen)
             identity_n_loss = identity_loss(noise, fake_n)
             total_gen_loss = 1/2 * gen_s_loss + gen_loss
-            total_s_loss = identity_s_loss + total_gen_loss + 0.5 * identity_g_loss
+            total_s_loss = identity_s_loss * 2 + total_gen_loss + 0.5
             total_n_loss = total_gen_loss + n_loss + identity_n_loss
             total_i_loss = identity_g_loss + total_gen_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -169,6 +172,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         generator_n_optimizer.apply_gradients(zip(gradients_of_n_generator, generator_n.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
+    '''
     checkpoint_path = "./checkpoints/test1/01_06/" + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
@@ -184,6 +188,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
     if ckpt_manager.latest_checkpoint:
         ckpt.restore(ckpt_manager.latest_checkpoint)
         print('Latest checkpoint restored!!')
+    '''
     feature, labels, symbol, noise = shuffle_data(data, BUFFER_SIZE)
     train_f = tf.data.Dataset.from_tensor_slices(feature).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
     train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
@@ -209,10 +214,11 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             test_relative =np.median(abs((s - labels)/labels))
             gen_relative = np.median(abs((gen-real_feature)/real_feature))
             print("_____Test Result:_____")
+            '''
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                         ckpt_save_path))
-
+            '''
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
             print('The generator total loss is', gen_loss)
@@ -246,7 +252,7 @@ if __name__ == '__main__':
         data_label = "my_labels" + i
         file_directory = 'method' + i
         generator_s = make_generator(blockSize)
-        generator_n = noise_generator(blockSize)
+        generator_n = make_generator(blockSize)
         generator_i = make_generator(blockSize)
         discriminator_t = make_discriminator_model(blockSize)
         discriminator_d = make_discriminator_model(blockSize)
