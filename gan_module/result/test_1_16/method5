@@ -1,2 +1,2 @@
 ,mixed loss,signal loss,categories loss
-0,"tf.Tensor(1.3115313, shape=(), dtype=float32)","tf.Tensor(5.173391e-05, shape=(), dtype=float32)","tf.Tensor(1.1920929e-07, shape=(), dtype=float32)"
+0,"tf.Tensor(1.3347969, shape=(), dtype=float32)","tf.Tensor(5.1588646e-05, shape=(), dtype=float32)","tf.Tensor(1.1920929e-07, shape=(), dtype=float32)"
