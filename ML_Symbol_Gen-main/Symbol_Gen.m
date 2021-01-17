@@ -15,7 +15,7 @@ VISUALIZE = 1;      % Set to 1 to show received constellations
 %% Simulation Parameters
 Len_block = 100;    % Number of symbols per block
 Num_blocks = 1000;     % Number of blocks observed in dataset
-p_int = 0;        % Probability of interference being present in a block
+p_int = 0.5;        % Probability of interference being present in a block
 
 %SNR = 100*ones(1,Num_blocks);   % Constant for all blocks
 SNR_MIN = 50; SNR_MAX = 150;

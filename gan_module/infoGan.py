@@ -89,12 +89,10 @@ def classifier(blockSize):
     c_input = keras.layers.Input(shape=input_shape)
     cn_1 = layers.Conv2D(64, (2, 1), padding='same')(c_input)
     bn_1 = layers.BatchNormalization()(cn_1)
-    act_1 = layers.LeakyReLU()(bn_1)
-    dr_1 = layers.Dropout(0.3)(act_1)
+    dr_1 = layers.Dropout(0.3)(bn_1)
     cn_2 = layers.Conv2D(128, (2, 1), padding='same')(dr_1)
     bn_2 = layers.BatchNormalization()(cn_2)
-    act_2 = layers.LeakyReLU()(bn_2)
-    dr_2 = layers.Dropout(0.3)(act_2)
+    dr_2 = layers.Dropout(0.3)(bn_2)
     clf_out = keras.layers.Dense(1)(dr_2)
     mu = keras.layers.Dense(1)(dr_2)
     sigma = keras.layers.Dense(1, activation=lambda x: tf.math.exp(x))(dr_2)
@@ -183,7 +181,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         classifier_t_optimizer.apply_gradients(zip(gradients_of_classifier_t, classifier_t.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
-    checkpoint_path = "./checkpoints/test2/01_17/" + filePath
+    checkpoint_path = "./checkpoints/test3/01_17/" + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
                                generator_i=generator_i,
