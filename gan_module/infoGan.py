@@ -95,7 +95,7 @@ def classifier(blockSize):
     bn_2 = layers.BatchNormalization()(cn_2)
     act_2 = layers.LeakyReLU()(bn_2)
     dr_2 = layers.Dropout(0.3)(act_2)
-    clf_out = keras.layers.Dense(1, activation="linear")(dr_2)
+    clf_out = keras.layers.Dense(1)(dr_2)
     mu = keras.layers.Dense(1)(dr_2)
     sigma = keras.layers.Dense(1, activation=lambda x: tf.math.exp(x))(dr_2)
     model = keras.models.Model(inputs = c_input, outputs = [clf_out, mu, sigma])
