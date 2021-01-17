@@ -183,7 +183,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         classifier_t_optimizer.apply_gradients(zip(gradients_of_classifier_t, classifier_t.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
-    checkpoint_path = "./checkpoints/test1/01_16/" + filePath
+    checkpoint_path = "./checkpoints/test2/01_17/" + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
                                generator_i=generator_i,
