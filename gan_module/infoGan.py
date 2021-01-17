@@ -116,7 +116,7 @@ def generator_loss(fake_output):
 
 
 def noise_loss(noise_output):
-    return mean_abs_loss(0, noise_output) * LAMBDA
+    return mean_abs_loss(0, noise_output)
 
 
 def cat_loss(c_label, c_output):
@@ -213,17 +213,19 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('.', end='')
             n += 1
         if epoch == EPOCHS-1:
-            s = generator_s(feature, training=False)
-            i = generator_i(feature, training=False)
-            fake_n = generator_n(feature, training=False)
-            gen = s + i + fake_n
-            test = abs(s - labels).numpy().mean()
-            real_feature = feature[:,:,:2,:]
-            gen_loss = abs(gen - real_feature).numpy().mean()
-            noise_l = abs(noise - fake_n).numpy().mean()
-            noise_relative =np.median(abs((noise-fake_n)/noise))
-            test_relative =np.median(abs((s - labels)/labels))
-            gen_relative = np.median(abs((gen-real_feature)/real_feature))
+            fake_c, mu, sigma = classifier_t(feature)
+            sample = tf.random.normal([1000, blockSize, 2, 1])
+            fake_s = generator_s(sample)
+            fake_i = generator_i(sample)
+            fake_n = generator_n(sample)
+            fake_mixed = fake_s + fake_i + fake_n
+            fake_t = discriminator_t(fake_mixed)
+            fake_d = discriminator_d(fake_s)
+            real_t = discriminator_t(feature)
+            real_d = discriminator_d(labels)
+            discriminator_t_loss = discriminator_loss(real_t, fake_t)
+            discriminator_d_loss = discriminator_loss(real_d, fake_d)
+            categorical_c_loss = cat_loss(fake_c, labels)
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
@@ -231,25 +233,21 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
-            print('The generator total loss is', gen_loss)
-            print('The signal loss is ', test)
-            print("the noise loss is", noise_l)
+            print('The generator total loss is', discriminator_t_loss)
+            print('The signal loss is ', discriminator_d_loss)
+            print("the signal categories loss is", categorical_c_loss)
             print("___________________\n")
             data = pd.DataFrame({
-                "gen_loss": gen_loss,
-                "gen_relative_loss": gen_relative,
-                "signal_loss": test,
-                "signal_relative_loss": test_relative,
-                "noise_loss": noise_l,
-                "noise_relative_loss": noise_relative
+                "mixed loss": discriminator_t_loss,
+                "signal loss": discriminator_d_loss,
+                "categories loss": categorical_c_loss
             }, index=[0])
             data.to_csv("./result/test_1_16/"+filePath)
 
 
 
 if __name__ == '__main__':
-    LAMBDA = 100
-    EPOCHS = 200
+    EPOCHS = 500
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
