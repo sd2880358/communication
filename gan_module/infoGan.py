@@ -95,7 +95,7 @@ def classifier(blockSize):
     bn_2 = layers.BatchNormalization()(cn_2)
     act_2 = layers.LeakyReLU()(bn_2)
     dr_2 = layers.Dropout(0.3)(act_2)
-    clf_out = keras.layers.Dense(1, activation="softmax")(dr_2)
+    clf_out = keras.layers.Dense(1, activation="linear")(dr_2)
     mu = keras.layers.Dense(1)(dr_2)
     sigma = keras.layers.Dense(1, activation=lambda x: tf.math.exp(x))(dr_2)
     model = keras.models.Model(inputs = c_input, outputs = [clf_out, mu, sigma])
@@ -214,6 +214,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             n += 1
         if epoch == EPOCHS-1:
             fake_c, mu, sigma = classifier_t(feature)
+            print(fake_c)
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
             fake_i = generator_i(sample)
@@ -247,7 +248,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 500
+    EPOCHS = 1000
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
