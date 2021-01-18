@@ -99,7 +99,7 @@ def classifier(blockSize):
 
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 mean_abs_loss = tf.keras.losses.MeanAbsoluteError()
-categorical_loss = tf.keras.losses.CategoricalCrossentropy()
+categories_loss = tf.keras.losses.CategoricalCrossentropy()
 
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
@@ -115,10 +115,8 @@ def noise_loss(noise_output):
     return mean_abs_loss(0, noise_output)
 
 
-def info_loss(c, c_hat):
-    loss = tf.reduce_mean(tf.abs((c, c_hat)))
-    sce = categorical_loss(c, c_hat)
-    return loss + sce
+def cat_loss(c, c_hat):
+    return categories_loss(c, c_hat)
 
 def shuffle_data(my_table, blockSize):
     '''
@@ -161,7 +159,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             gen_s_loss = generator_loss(fake_d)
             disc_t_loss = discriminator_loss(real_t, fake_t)
             disc_d_loss = discriminator_loss(real_d, fake_d)
-            class_t_loss = info_loss(s, c_hat)
+            class_t_loss = cat_loss(c_hat, s)
             dist = tfp.distributions.Normal(loc=mu, scale=sigma)
             c_1_loss = tf.reduce_mean(-dist.log_prob(g_noise))
             total_gen_loss = gen_loss + (class_t_loss + 0.1 * c_1_loss)
@@ -215,7 +213,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print(fake_c)
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
-            fake_i = generator_i(sample)
+            fake_i = generator_i(sample)           
             fake_n = generator_n(sample)
             fake_mixed = fake_s + fake_i + fake_n
             fake_t = discriminator_t(fake_mixed)
@@ -224,7 +222,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             real_d = discriminator_d(labels)
             discriminator_t_loss = discriminator_loss(real_t, fake_t)
             discriminator_d_loss = discriminator_loss(real_d, fake_d)
-            categorical_c_loss = info_loss(fake_c, labels)
+            categorical_c_loss = cat_loss(fake_c, labels)
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
