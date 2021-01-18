@@ -211,9 +211,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         if epoch == EPOCHS-1:
             fake_c, mu, sigma = classifier_t(feature)
             sample = tf.random.normal([1000, blockSize, 2, 1])
-            fake_s = generator_s(feature)
-            fake_i = generator_i(feature)
-            fake_n = generator_n(feature)
+            fake_s = generator_s(sample)
+            fake_i = generator_i(sample)
+            fake_n = generator_n(sample)
             print(fake_s)
             fake_mixed = fake_s + fake_i + fake_n
             fake_t = discriminator_t(fake_mixed)
