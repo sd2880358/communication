@@ -152,7 +152,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             gen = (s + fake_n + i)
             c_hat, mu, sigma = classifier_t(gen)
             fake_t = discriminator_t(gen, training=True)
-            real_t = discriminator_t(gen, training=True)
+            real_t = discriminator_t(total, training=True)
             gen_loss = generator_loss(fake_t)
             fake_d = discriminator_d(s, training=True)
             real_d = discriminator_d(label, training=True)
