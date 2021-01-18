@@ -115,8 +115,10 @@ def noise_loss(noise_output):
     return mean_abs_loss(0, noise_output)
 
 
-def cat_loss(c_label, c_output):
-    return categorical_loss(c_label, c_output)
+def info_loss(c, c_hat):
+    c = mean_abs_loss(c, c_hat)
+    sce = categorical_loss(c, c_hat)
+    return c + sce
 
 def shuffle_data(my_table, blockSize):
     '''
@@ -159,7 +161,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             gen_s_loss = generator_loss(fake_d)
             disc_t_loss = discriminator_loss(real_t, fake_t)
             disc_d_loss = discriminator_loss(real_d, fake_d)
-            class_t_loss = cat_loss(c_hat, s)
+            class_t_loss = info_loss(c_hat, s)
             dist = tfp.distributions.Normal(loc=mu, scale=sigma)
             c_1_loss = tf.reduce_mean(-dist.log_prob(g_noise))
             total_gen_loss = gen_loss + (class_t_loss + 0.1 * c_1_loss)
