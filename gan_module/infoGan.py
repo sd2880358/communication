@@ -91,7 +91,7 @@ def classifier(blockSize):
     dr_1 = layers.Dropout(0.3)(cn_1)
     cn_2 = layers.Conv2D(128, (2, 1), padding='same')(dr_1)
     dr_2 = layers.Dropout(0.3)(cn_2)
-    clf_out = keras.layers.Dense(1)(dr_2)
+    clf_out = keras.layers.Dense(1)(dr_2, activation="softmax")
     mu = keras.layers.Dense(1)(dr_2)
     sigma = keras.layers.Dense(1, activation=lambda x: tf.math.exp(x))(dr_2)
     model = keras.models.Model(inputs = c_input, outputs = [clf_out, mu, sigma])
@@ -210,11 +210,10 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             n += 1
         if epoch == EPOCHS-1:
             fake_c, mu, sigma = classifier_t(feature)
-            print(fake_c)
             sample = tf.random.normal([1000, blockSize, 2, 1])
-            fake_s = generator_s(sample)
-            fake_i = generator_i(sample)           
-            fake_n = generator_n(sample)
+            fake_s = generator_s(feature)
+            fake_i = generator_i(feature)
+            fake_n = generator_n(feature)
             print(fake_s)
             fake_mixed = fake_s + fake_i + fake_n
             fake_t = discriminator_t(fake_mixed)
