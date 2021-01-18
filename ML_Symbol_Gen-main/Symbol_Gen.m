@@ -21,7 +21,7 @@ p_int = 0.5;        % Probability of interference being present in a block
 SNR_MIN = 50; SNR_MAX = 150;
 SNR = (SNR_MAX-SNR_MIN)*rand(1,Num_blocks) + SNR_MIN;
 
-SIR = 10;                       % Signal to Interference Ratio
+SIR = 50;                       % Signal to Interference Ratio
 %SINR = SNR/(INR + 1);          % Signal to Interference plus Noise Ratio
 
 
@@ -130,6 +130,6 @@ if VISUALIZE
 
 end
 
-save my_labels.mat L_Constellations L_Interference L_S_x L_S_i N X
-save my_decoder.mat S_hat_4 S_hat_16 SER_16 SER_4
-save my_data.mat Y
+save my_labels5.mat L_Constellations L_Interference L_S_x L_S_i N X
+save my_decoder5.mat S_hat_4 S_hat_16 SER_16 SER_4
+save my_data5.mat Y

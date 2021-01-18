@@ -218,20 +218,20 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "noise_loss": noise_l,
                 "noise_relative_loss": noise_relative
             }, index=[0])
-            data.to_csv("./result/test_1_04"+filePath)
+            data.to_csv("./result/test_1_17/"+filePath)
 
 
 
 if __name__ == '__main__':
-    LAMBDA = 100
-    EPOCHS = 500
+    LAMBDA = 10
+    EPOCHS = 200
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    for i in range(5,6):
-        blockSize = i*10
+    for i in range(1,6):
+        blockSize = 50
         i = str(i)
         data = "my_data" + i
         data_label = "my_labels" + i
