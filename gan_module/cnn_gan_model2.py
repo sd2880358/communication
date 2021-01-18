@@ -56,12 +56,12 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (1, 3), strides=(1,3), activation="linear",
+    model.add(layers.Conv2D(64, (1, 3), strides=(1,3), activation="linear",
                             input_shape=(blockSize, 3, 1)))
-    model.add(layers.Conv2D(32, (1,16), activation="linear", padding='same'))
-    model.add(layers.Conv2D(16, (1,32), activation="linear", padding='same'))
-    model.add(layers.Reshape((blockSize, 16, 1)))
-    model.add(layers.AveragePooling2D((1,8)))
+    model.add(layers.Conv2D(128, (1,16), activation="linear", padding='same'))
+    model.add(layers.Conv2D(64, (1,32), activation="linear", padding='same'))
+    model.add(layers.Reshape((blockSize, 64, 1)))
+    model.add(layers.AveragePooling2D((1, 32)))
     model.add(layers.Dense(1))
     return model
 
@@ -132,7 +132,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             s = generator_s(total, training=True)
             fake_n = generator_n(total, training=True)
             i = generator_i(total, training=True)
-            gen = (s + fake_n + i)
+            gen = (s + fake_n + i*0.1)
             real_feature = total[:, :, :2, :]
             fake_t = discriminator_t(gen, training=True)
             real_t = discriminator_t(real_feature, training=True)
@@ -147,7 +147,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             identity_g_loss = identity_loss(real_feature, gen)
             identity_n_loss = identity_loss(noise, fake_n)
             total_gen_loss = 1/2 * gen_s_loss + gen_loss
-            total_s_loss = identity_s_loss + total_gen_loss + 0.5
+            total_s_loss = identity_s_loss * 2 + total_gen_loss + 0.5
             total_n_loss = total_gen_loss + n_loss + identity_n_loss
             total_i_loss = identity_g_loss + total_gen_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
@@ -191,7 +191,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             s = generator_s(feature, training=False)
             i = generator_i(feature, training=False)
             fake_n = generator_n(feature, training=False)
-            gen = s + i + fake_n
+            gen = s + i*0.1 + fake_n
+            print(s)
             test = abs(s - labels).numpy().mean()
             real_feature = feature[:,:,:2,:]
             gen_loss = abs(gen - real_feature).numpy().mean()
@@ -218,24 +219,24 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "noise_loss": noise_l,
                 "noise_relative_loss": noise_relative
             }, index=[0])
-            data.to_csv("./result/test_1_17/"+filePath)
+            data.to_csv("./result/test_1_04"+filePath)
 
 
 
 if __name__ == '__main__':
     LAMBDA = 100
-    EPOCHS = 150
+    EPOCHS = 500
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    for i in range(10,11):
+    for i in range(5,6):
         blockSize = i*10
         i = str(i)
-        data = "my_data"
-        data_label = "my_labels"
-        file_directory = 'method'
+        data = "my_data" + i
+        data_label = "my_labels" + i
+        file_directory = 'method' + i
         generator_s = make_generator(blockSize)
         generator_n = make_generator(blockSize)
         generator_i = make_generator(blockSize)
