@@ -231,12 +231,12 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
             print('The generator total loss is', mixed_loss)
-            print('The signal loss is ', fake_s)
+            print('The signal loss is ', fake_s_loss)
             print("the signal categories loss is", categorical_c_loss)
             print("___________________\n")
             data = pd.DataFrame({
-                "mixed loss": discriminator_t_loss,
-                "signal loss": discriminator_d_loss,
+                "mixed loss": mixed_loss,
+                "signal loss": fake_s_loss,
                 "categories loss": categorical_c_loss
             }, index=[0])
             data.to_csv("./result/test_1_16/"+filePath)
