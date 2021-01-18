@@ -163,7 +163,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             dist = tfp.distributions.Normal(loc=mu, scale=sigma)
             c_1_loss = tf.reduce_mean(-dist.log_prob(g_noise))
             total_gen_loss = gen_loss + (class_t_loss + 0.1 * c_1_loss)
-            total_s_loss = total_gen_loss + 1/2 * gen_s_loss
+            total_s_loss = gen_s_loss
             total_n_loss = total_gen_loss
             total_i_loss = total_gen_loss
             q_loss = class_t_loss +  0.1 * c_1_loss
@@ -220,8 +220,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_d = discriminator_d(fake_s)
             real_t = discriminator_t(feature)
             real_d = discriminator_d(labels)
-            discriminator_t_loss = discriminator_loss(real_t, fake_t)
-            discriminator_d_loss = discriminator_loss(real_d, fake_d)
+            mixed_loss = generator_loss(fake_mixed)
+            fake_s_loss = generator_loss(fake_s)
             categorical_c_loss = cat_loss(fake_c, labels)
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
@@ -230,8 +230,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
-            print('The generator total loss is', discriminator_t_loss)
-            print('The signal loss is ', discriminator_d_loss)
+            print('The generator total loss is', mixed_loss)
+            print('The signal loss is ', fake_s)
             print("the signal categories loss is", categorical_c_loss)
             print("___________________\n")
             data = pd.DataFrame({
