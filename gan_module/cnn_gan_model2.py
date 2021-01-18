@@ -83,7 +83,6 @@ def make_discriminator_model(blockSize):
 
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 mean_abs_loss = tf.keras.losses.MeanAbsoluteError()
-categorical_loss = tf.keras.losses.CategoricalCrossentropy()
 
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
@@ -193,8 +192,13 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             i = generator_i(feature, training=False)
             fake_n = generator_n(feature, training=False)
             gen = s + i*0.1 + fake_n
-            signal_relative = categorical_loss(labels, s)
-            gen_relative = categorical_loss(feature, gen)
+            test = abs(s - labels).numpy().mean()
+            real_feature = feature[:,:,:2,:]
+            gen_loss = abs(gen - real_feature).numpy().mean()
+            noise_l = abs(noise - fake_n).numpy().mean()
+            noise_relative =np.median(abs((noise-fake_n)/noise))
+            test_relative =np.median(abs((s - labels)/labels))
+            gen_relative = np.median(abs((gen-real_feature)/real_feature))
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
@@ -202,12 +206,17 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                        time.time() - start))
-            print('The generator total loss is', gen_relative)
-            print('The signal loss is ', signal_relative)
+            print('The generator total loss is', gen_loss)
+            print('The signal loss is ', test)
+            print("the noise loss is", noise_l)
             print("___________________\n")
             data = pd.DataFrame({
+                "gen_loss": gen_loss,
                 "gen_relative_loss": gen_relative,
-                "signal_relative_loss": signal_relative,
+                "signal_loss": test,
+                "signal_relative_loss": test_relative,
+                "noise_loss": noise_l,
+                "noise_relative_loss": noise_relative
             }, index=[0])
             data.to_csv("./result/test_1_04"+filePath)
 
