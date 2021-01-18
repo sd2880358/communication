@@ -116,7 +116,7 @@ def noise_loss(noise_output):
 
 
 def info_loss(c, c_hat):
-    loss = tf.reduce_mean(tf.reduce_sum(tf.square(c, c_hat), -1)) * 0.5
+    loss = tf.reduce_mean(tf.abs((c, c_hat)))
     sce = categorical_loss(c, c_hat)
     return loss + sce
 
