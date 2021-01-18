@@ -91,7 +91,7 @@ def classifier(blockSize):
     dr_1 = layers.Dropout(0.3)(cn_1)
     cn_2 = layers.Conv2D(128, (2, 1), padding='same')(dr_1)
     dr_2 = layers.Dropout(0.3)(cn_2)
-    clf_out = keras.layers.Dense(1)(dr_2, activation="softmax")
+    clf_out = keras.layers.Dense(1,  activation="softmax")(dr_2)
     mu = keras.layers.Dense(1)(dr_2)
     sigma = keras.layers.Dense(1, activation=lambda x: tf.math.exp(x))(dr_2)
     model = keras.models.Model(inputs = c_input, outputs = [clf_out, mu, sigma])
