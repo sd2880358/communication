@@ -157,7 +157,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disc_t_loss = discriminator_loss(real_t, fake_t)
             disc_d_loss = discriminator_loss(real_d, fake_d)
             id_loss = identity_loss(s_hat, s)
-            total_s_loss = gen_loss + gen_s_loss * 0.5
+            total_s_loss = gen_loss * 0.5 + gen_s_loss
             total_n_loss = n_loss + gen_loss
             total_i_loss = gen_loss
             disentangle_loss = id_loss * 0.5 +  gen_s_loss
@@ -173,7 +173,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         disentangle_t_optimizer.apply_gradients(zip(gradients_of_disentangle_t, disentangle_t.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
-    checkpoint_path = "./checkpoints/test4/" + date + filePath
+    checkpoint_path = "./checkpoints/test5/" + date + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_n=generator_n,
                                generator_i=generator_i,
