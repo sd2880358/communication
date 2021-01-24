@@ -205,6 +205,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         if epoch == EPOCHS-1:
             fake_c = disentangle_t(feature)
             id_loss = abs(fake_c - feature).numpy().mean()
+            print(fake_c)
+            '''
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
             fake_i = generator_i(sample)
@@ -217,6 +219,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             gen_s_loss = generator_loss(fake_d)
             print(gen_total_loss)
             print(gen_s_loss)
+            '''
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
@@ -234,7 +237,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 100
+    EPOCHS = 1
     LAMBDA = 10
     date = "1_24/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
