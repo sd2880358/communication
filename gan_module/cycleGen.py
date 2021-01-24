@@ -184,7 +184,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                                generator_s_optimizer=generator_s_optimizer,
                                generator_n_optimizer=generator_n_optimizer,
                                generator_i_optimizer=generator_i_optimizer,
-                               classifier_t_optimizer=classifier_t_optimizer,
+                               disentangle_t_optimizer=disentangle_t_optimizer,
                                discriminator_d_optimizer=discriminator_d_optimizer,
                                discriminator_t_optimizer=discriminator_t_optimizer)
     ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
