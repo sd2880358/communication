@@ -239,7 +239,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 400
+    EPOCHS = 500
     LAMBDA = 10
     date = "1_24/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -248,7 +248,7 @@ if __name__ == '__main__':
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     disentangle_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    for i in range(1,6):
+    for i in [1,3]:
         blockSize = 50
         i = str(i)
         data = "my_data" + i
