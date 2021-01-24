@@ -212,8 +212,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_n = generator_n(sample)
             fake_mixed = fake_s + fake_i + fake_n
             print(fake_mixed[:,1,1])
-            fake_t = discriminator_t(fake_mixed[:,1,1])
-            fake_d = discriminator_d(fake_s[:,1,1])
+            fake_t = discriminator_t(fake_mixed[0])
+            fake_d = discriminator_d(fake_s[0])
             print(fake_t)
             print(fake_d)
             print("_____Test Result:_____")
