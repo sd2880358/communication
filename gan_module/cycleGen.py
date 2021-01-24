@@ -208,20 +208,16 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         if epoch == EPOCHS-1:
             fake_c = disentangle_t(feature)
             id_loss = abs(fake_c - feature).numpy().mean()
-            '''
+            sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
             fake_i = generator_i(sample)
             fake_n = generator_n(sample)
             fake_mixed = fake_s + fake_i + fake_n
-            print(fake_mixed)
-            
+            print(fake_mixed[:,1,1,1])
             fake_t = discriminator_t(fake_mixed)
             fake_d = discriminator_d(fake_s)
-            real_t = discriminator_t(feature)
-            real_d = discriminator_d(labels)
-            mixed_loss = generator_loss(fake_mixed)
-            fake_s_loss = generator_loss(fake_s)
-            '''
+            print(fake_t)
+            print(fake_d)
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
