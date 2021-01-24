@@ -215,8 +215,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_d = discriminator_d(fake_s)
             gen_total_loss = generator_loss(fake_t)
             gen_s_loss = generator_loss(fake_d)
-            print(gen_total_loss[0])
-            print(gen_s_loss[0])
+            print(gen_total_loss)
+            print(gen_s_loss)
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
