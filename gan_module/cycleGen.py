@@ -204,7 +204,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             n += 1
         if epoch == EPOCHS-1:
             fake_c = disentangle_t(feature)
-            id_loss = abs(fake_c - feature).numpy().mean()
+            id_loss = abs(fake_c - labels).numpy().mean()
             print(fake_c)
             '''
             sample = tf.random.normal([1000, blockSize, 2, 1])
