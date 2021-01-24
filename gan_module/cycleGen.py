@@ -73,7 +73,6 @@ def make_discriminator_model(blockSize):
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(64, (2, 1), strides=(1, 1), padding='same',
                                      input_shape=(blockSize, 2, 1)))
-    model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
     model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
@@ -212,10 +211,12 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_n = generator_n(sample)
             fake_mixed = fake_s + fake_i + fake_n
             print(fake_mixed[:,1,1])
-            fake_t = discriminator_t(feature)
-            fake_d = discriminator_d(labels)
-            print(fake_t[0])
-            print(fake_d[0])
+            fake_t = discriminator_t(fake_mixed)
+            fake_d = discriminator_d(fake_s)
+            gen_total_loss = generator_loss(fake_t)
+            gen_s_loss = generator_loss(fake_d)
+            print(gen_total_loss[0])
+            print(gen_s_loss[0])
             print("_____Test Result:_____")
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
