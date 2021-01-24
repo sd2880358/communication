@@ -79,7 +79,6 @@ def make_discriminator_model(blockSize):
     model.add(layers.Conv2D(128, (5, 5), strides=(2, 2), padding='same'))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
-    model  = model
     model.add(layers.Flatten())
     model.add(layers.Dense(1))
     return model
@@ -97,7 +96,6 @@ def disentanglement(blockSize):
 
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 mean_abs_loss = tf.keras.losses.MeanAbsoluteError()
-categories_loss = tf.keras.losses.CategoricalCrossentropy()
 
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)
