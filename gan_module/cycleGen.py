@@ -171,7 +171,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         generator_s_optimizer.apply_gradients(zip(gradients_of_s_generator, generator_s.trainable_variables))
         generator_i_optimizer.apply_gradients(zip(gradients_of_i_generator, generator_i.trainable_variables))
         generator_n_optimizer.apply_gradients(zip(gradients_of_n_generator, generator_n.trainable_variables))
-        classifier_t_optimizer.apply_gradients(zip(gradients_of_disentangle_t, disentangle_t.trainable_variables))
+        disentangle_t_optimizer.apply_gradients(zip(gradients_of_disentangle_t, disentangle_t.trainable_variables))
         discriminator_t_optimizer.apply_gradients(zip(gradients_of_discriminator_t, discriminator_t.trainable_variables))
         discriminator_d_optimizer.apply_gradients(zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
     checkpoint_path = "./checkpoints/test4/" + date + filePath
@@ -233,7 +233,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 100
+    EPOCHS = 10
     LAMBDA = 10
     date = "1_24/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -241,7 +241,7 @@ if __name__ == '__main__':
     generator_i_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    classifier_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+    disentangle_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     for i in range(5,6):
         blockSize = i*10
         i = str(i)
