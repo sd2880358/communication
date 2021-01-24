@@ -212,8 +212,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_n = generator_n(sample)
             fake_mixed = fake_s + fake_i + fake_n
             print(fake_mixed[:,1,1])
-            fake_t = discriminator_t(fake_mixed)
-            fake_d = discriminator_d(fake_s)
+            fake_t = discriminator_t(fake_mixed[:,1,1])
+            fake_d = discriminator_d(fake_s[:,1,1])
             print(fake_t)
             print(fake_d)
             print("_____Test Result:_____")
@@ -233,7 +233,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1
+    EPOCHS = 100
     LAMBDA = 10
     date = "1_24/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
