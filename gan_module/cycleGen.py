@@ -204,8 +204,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             n += 1
         if epoch == EPOCHS-1:
             fake_c = disentangle_t(feature)
-            id_loss = abs(fake_c - feature).numpy().mean()
-            relative_loss = np.median(abs((feature - fake_c) / feature))
+            id_loss = abs(fake_c - labels).numpy().mean()
+            relative_loss = np.median(abs((labels - fake_c) / labels))
             '''
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
@@ -240,7 +240,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 if __name__ == '__main__':
     EPOCHS = 300
-    LAMBDA = 10
+    LAMBDA = 1
     date = "1_24/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_n_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
