@@ -160,7 +160,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             total_s_loss = gen_s_loss * 2
             total_n_loss = n_loss + gen_loss * 0.1
             total_i_loss = gen_loss * 0.1
-            disentangle_loss = id_loss * 0.5 +  gen_s_loss
+            disentangle_loss = id_loss * 0.5 +  total_s_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
         gradients_of_n_generator = tape.gradient(total_n_loss, generator_n.trainable_variables)
