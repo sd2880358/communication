@@ -248,7 +248,7 @@ if __name__ == '__main__':
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     disentangle_t_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    for i in [1]:
+    for i in [3]:
         blockSize = 50
         i = str(i)
         data = "my_data" + i
