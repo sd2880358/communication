@@ -157,9 +157,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disc_t_loss = discriminator_loss(real_t, fake_t)
             disc_d_loss = discriminator_loss(real_d, fake_d)
             id_loss = identity_loss(s_hat, s)
-            total_s_loss = gen_loss  + gen_s_loss * 0.5
-            total_n_loss = n_loss + gen_loss
-            total_i_loss = gen_loss
+            total_s_loss = gen_loss * 0.9 + gen_s_loss
+            total_n_loss = n_loss + gen_loss * 0.1
+            total_i_loss = gen_loss * 0.1
             disentangle_loss = id_loss * 0.5 +  gen_s_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_i_generator = tape.gradient(total_i_loss, generator_i.trainable_variables)
