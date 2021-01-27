@@ -236,8 +236,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             id_loss = abs(fake_s - fake_c).numpy().mean()
             relative_loss = np.median(abs((fake_s - fake_c) / fake_c))
             '''
-            id_loss = abs(fake_c - labels).numpy().mean()
-            relative_loss = np.median(abs((labels - fake_c) / labels))
+            id_loss = abs(fake_s - labels).numpy().mean()
+            relative_loss = np.median(abs((labels - fake_s) / labels))
             '''
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
