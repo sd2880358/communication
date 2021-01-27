@@ -154,6 +154,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             gen = (s + fake_u)
             s_hat = disentangle_t(gen)
             u_k = total - label
+            print("the unknown information is", u_k[1,1,1])
             result_fake_u = discriminator_u(fake_u, training=True)
             result_real_u = discriminator_u(u_k, training=True)
             fake_t = discriminator_t(gen, training=True)
