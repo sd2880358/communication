@@ -217,21 +217,20 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('.', end='')
             n += 1
         if epoch == EPOCHS - 1:
-            '''
-            measuring the absolute loss between generator and disentanglement
+
+            ## measuring the absolute loss between generator and disentanglement
             g_noise = tf.random.normal([BATCH_SIZE, blockSize, 2, 1])
             fake_c = generator_s(g_noise)
-            fake_i = generator_i(g_noise)
-            fake_n = generator_n(g_noise)
-            fake_mixed = fake_c + fake_i + fake_n
+            fake_u = generator_u(g_noise)
+            fake_mixed = fake_c + fake_u
             fake_s = disentangle_t(fake_mixed)
-            loss = abs(fake_s - fake_c).numpy().mean()
+            id_loss = abs(fake_s - fake_c).numpy().mean()
             relative_loss = np.median(abs((fake_s - fake_c) / fake_c))
             '''
             fake_c = disentangle_t(feature)
             id_loss = abs(fake_c - labels).numpy().mean()
             relative_loss = np.median(abs((labels - fake_c) / labels))
-            '''
+        
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
             fake_i = generator_i(sample)
@@ -263,7 +262,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 100
+    EPOCHS = 1
     LAMBDA = 10
     date = "1_27/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
