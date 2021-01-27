@@ -154,7 +154,6 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             gen = (s + fake_u)
             s_hat = disentangle_t(gen)
             u_k = total - label
-            print("test value of signal is",  s[1,1,1])
             result_fake_u = discriminator_u(fake_u, training=True)
             result_real_u = discriminator_u(u_k, training=True)
             fake_t = discriminator_t(gen, training=True)
@@ -206,11 +205,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         ckpt.restore(ckpt_manager.latest_checkpoint)
         print('Latest checkpoint restored!!')
     feature, labels, symbol, noise = shuffle_data(data, BUFFER_SIZE)
-    test = feature - labels
-    print(test[1,1,1])
-    train_f = tf.data.Dataset.from_tensor_slices(feature).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-    train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
-    train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
+    train_f = tf.data.Dataset.from_tensor_slices(feature).batch(BATCH_SIZE)
+    train_l = tf.data.Dataset.from_tensor_slices(labels).batch(BATCH_SIZE)
     for epoch in range(EPOCHS):
         start = time.time()
         n = 0
@@ -222,7 +218,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         if epoch == EPOCHS - 1:
 
             ## measuring the absolute loss between generator and disentanglement
-
+            '''
             g_noise = tf.random.normal([BATCH_SIZE, blockSize, 2, 1])
             fake_c = generator_s(g_noise)
             fake_u = generator_u(g_noise)
@@ -230,15 +226,11 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_s = disentangle_t(fake_mixed)
             id_loss = abs(fake_s - fake_c).numpy().mean()
             relative_loss = np.median(abs((fake_s - fake_c) / fake_c))
-            print("----------")
-            print(fake_c[1,1,1])
-            print(fake_u[1,1,1])
-            print("-----")
             '''
             fake_c = disentangle_t(feature)
             id_loss = abs(fake_c - labels).numpy().mean()
             relative_loss = np.median(abs((labels - fake_c) / labels))
-            
+            '''
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
             fake_i = generator_i(sample)
