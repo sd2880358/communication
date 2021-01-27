@@ -229,8 +229,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_mixed = fake_c + fake_u
             print("result of fake mixed", fake_mixed[1,1,1])
             print("actual feature", feature[1,1,1])
-            print("actual fake labels", labels[1,1,1])
-            fake_s = disentangle_t(fake_mixed)
+            print("actual labels", labels[1,1,1])
+            fake_s = disentangle_t(feature)
+
             # relative loss between fake signal and signal_hat
             '''
             id_loss = abs(fake_s - fake_c).numpy().mean()
@@ -270,7 +271,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 100
+    EPOCHS = 1
     LAMBDA = 10
     date = "1_27/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
