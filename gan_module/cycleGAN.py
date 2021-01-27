@@ -208,9 +208,6 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         ckpt.restore(ckpt_manager.latest_checkpoint)
         print('Latest checkpoint restored!!')
     feature, labels, symbol, noise = shuffle_data(data, BUFFER_SIZE)
-    print("```````")
-    print(test)
-    print('````')
     train_f = tf.data.Dataset.from_tensor_slices(feature).batch(BATCH_SIZE)
     train_l = tf.data.Dataset.from_tensor_slices(labels).batch(BATCH_SIZE)
     for epoch in range(EPOCHS):
@@ -236,6 +233,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print("result of fake mixed", fake_mixed[1,1,1])
             print("actual feature", feature[1,1,1])
             print("actual labels", labels[1,1,1])
+            discriminator_result = discriminator_d(fake_c)
+            print(discriminator_result.mean())
             fake_s = disentangle_t(feature)
 
             # relative loss between fake signal and signal_hat
