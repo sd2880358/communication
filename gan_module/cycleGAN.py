@@ -229,6 +229,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_mixed = fake_c + fake_u
             print("result of fake mixed", fake_mixed[1,1,1])
             print("actual feature", feature[1,1,1])
+            print("actual fake labels", labels[1,1,1])
             fake_s = disentangle_t(fake_mixed)
             id_loss = abs(fake_s - fake_c).numpy().mean()
             relative_loss = np.median(abs((fake_s - fake_c) / fake_c))
