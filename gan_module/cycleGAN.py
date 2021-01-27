@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 import numpy as np
-import os, sys
+import random
 import scipy.io as sc
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -129,6 +129,9 @@ def shuffle_data(my_table, blockSize):
     my_table.real = (my_table.real / real_x) - real_y
     my_table.imag = (my_table.imag/ imag_x) - imag_y
     '''
+    groups = [df for _, df in my_table.groupby('block')]
+    random.shuffle(groups)
+    my_table = pd.concat(groups).reset_index()
     train_feature = my_table.loc[:, ('real', 'imag')]
     train_label = my_table.loc[:, ('label_real', 'label_imag')]
     noise = my_table.loc[:, ('N_R', 'N_I')]
@@ -167,8 +170,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disc_d_loss = discriminator_loss(real_d, fake_d)
             disc_u_loss = discriminator_loss(result_real_u, result_fake_u)
             id_loss = identity_loss(s_hat, s)
-            total_s_loss = gen_s_loss * 0.5 +  gen_loss
-            total_u_loss =  gen_u_loss * 0.5 + gen_loss
+            total_s_loss = gen_s_loss +  gen_loss
+            total_u_loss =  gen_u_loss + gen_loss
             disentangle_loss = id_loss + total_s_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_u_generator = tape.gradient(total_u_loss, generator_u.trainable_variables)
@@ -205,6 +208,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         ckpt.restore(ckpt_manager.latest_checkpoint)
         print('Latest checkpoint restored!!')
     feature, labels, symbol, noise = shuffle_data(data, BUFFER_SIZE)
+    print("```````")
+    print(test)
+    print('````')
     train_f = tf.data.Dataset.from_tensor_slices(feature).batch(BATCH_SIZE)
     train_l = tf.data.Dataset.from_tensor_slices(labels).batch(BATCH_SIZE)
     for epoch in range(EPOCHS):
