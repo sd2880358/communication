@@ -206,6 +206,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         ckpt.restore(ckpt_manager.latest_checkpoint)
         print('Latest checkpoint restored!!')
     feature, labels, symbol, noise = shuffle_data(data, BUFFER_SIZE)
+    test = feature - labels
+    print(test[1,1,1])
     train_f = tf.data.Dataset.from_tensor_slices(feature).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
     train_l = tf.data.Dataset.from_tensor_slices(labels).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
     train_n = tf.data.Dataset.from_tensor_slices(noise).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
