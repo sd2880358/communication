@@ -218,11 +218,16 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         if epoch == EPOCHS - 1:
 
             ## measuring the absolute loss between generator and disentanglement
-            '''
+
             g_noise = tf.random.normal([BATCH_SIZE, blockSize, 2, 1])
             fake_c = generator_s(g_noise)
             fake_u = generator_u(g_noise)
+            print("result of signal and interference")
+            print("---")
+            print("result of fake signal", fake_c[1,1,1])
+            print("result of fake unknown", fake_u[1,1,1])
             fake_mixed = fake_c + fake_u
+            print("result of fake mixed", fake_mixed[1,1,1])
             fake_s = disentangle_t(fake_mixed)
             id_loss = abs(fake_s - fake_c).numpy().mean()
             relative_loss = np.median(abs((fake_s - fake_c) / fake_c))
@@ -230,7 +235,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_c = disentangle_t(feature)
             id_loss = abs(fake_c - labels).numpy().mean()
             relative_loss = np.median(abs((labels - fake_c) / labels))
-            '''
+            
             sample = tf.random.normal([1000, blockSize, 2, 1])
             fake_s = generator_s(sample)
             fake_i = generator_i(sample)
