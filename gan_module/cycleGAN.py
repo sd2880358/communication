@@ -276,7 +276,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 10
+    EPOCHS = 300
     LAMBDA = 10
     date = "1_27/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
