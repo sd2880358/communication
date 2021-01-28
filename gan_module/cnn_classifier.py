@@ -10,7 +10,7 @@ from tensorflow.keras.layers.experimental import preprocessing
 import mlcTest as mlc
 
 
-
+'''
 def cnn_classifier(blocksize):
     model = keras.Sequential()
     model.add(layers.Conv2D(16, (1, 2), padding='same', activation='relu', input_shape=(1, blocksize, 2)))
@@ -22,9 +22,9 @@ def cnn_classifier(blocksize):
     model.add(layers.Dense(20))
     return model
 
-
-
 '''
+
+
 def cnn_classifier(blockSize):
     model = keras.Sequential()
     model.add(layers.Conv2D(16, (1, 1), activation='relu', input_shape=(1, blockSize, 2)))
@@ -36,7 +36,7 @@ def cnn_classifier(blockSize):
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(20))
     return model
-'''
+
 
 
 def training(data, blockSize):
