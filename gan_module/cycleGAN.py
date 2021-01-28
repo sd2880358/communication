@@ -307,8 +307,6 @@ if __name__ == '__main__':
         disentangle_t = disentanglement(blockSize)
         data_table = dataset(data, data_label)
         start_train(250, blockSize, data_table, file_directory)
-        '''
         data = pd.read_csv("./result/"+date+file_directory+"result")
         history = cls.training(data, 50)
         print(history)
-        '''
