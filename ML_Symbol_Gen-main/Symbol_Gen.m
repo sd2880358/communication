@@ -21,7 +21,7 @@ p_int = 0.75;        % Probability of interference being present in a block
 SNR_MIN = 50; SNR_MAX = 150;
 SNR = (SNR_MAX-SNR_MIN)*rand(1,Num_blocks) + SNR_MIN;
 
-SIR = 10;                       % Signal to Interference Ratio
+SIR = 5;                       % Signal to Interference Ratio
 %SINR = SNR/(INR + 1);          % Signal to Interference plus Noise Ratio
 
 
