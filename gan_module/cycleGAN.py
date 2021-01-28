@@ -242,7 +242,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "fake_signal_real":fake_s.numpy()[:,:,0].flatten(),
                  "fake_signal_imag": fake_s.numpy()[:,:,1].flatten(),
                 "block":data_table.block,
-                "labels": my_table.cons.numpy().flatten()}
+                "labels": my_table.cons.to_numpy().flatten()}
             )
             # relative loss between fake signal and signal_hat
             '''
