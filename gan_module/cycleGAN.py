@@ -171,8 +171,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disc_d_loss = discriminator_loss(real_d, fake_d)
             disc_u_loss = discriminator_loss(result_real_u, result_fake_u)
             id_loss = identity_loss(s_hat, s)
-            total_s_loss = gen_s_loss +  gen_loss
-            total_u_loss =  gen_u_loss + gen_loss
+            total_s_loss = gen_s_loss * 0.5 +  gen_loss
+            total_u_loss =  gen_u_loss * 0.5 + gen_loss
             disentangle_loss = id_loss + total_s_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_u_generator = tape.gradient(total_u_loss, generator_u.trainable_variables)
@@ -239,8 +239,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_s = disentangle_t(feature)
             result = pd.DataFrame(
                   {
-                "fake_signal_real":feature.numpy()[:,:,0].flatten(),
-                 "fake_signal_imag": feature.numpy()[:,:,1].flatten(),
+                "fake_signal_real":fake_s.numpy()[:,:,0].flatten(),
+                 "fake_signal_imag": fake_s.numpy()[:,:,1].flatten(),
                 "block":data_table.block,
                 "labels": symbol.numpy().flatten()}
             )
@@ -284,7 +284,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1
+    EPOCHS = 300
     LAMBDA = 10
     date = "1_27/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
