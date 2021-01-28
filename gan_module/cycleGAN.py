@@ -172,7 +172,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disc_u_loss = discriminator_loss(result_real_u, result_fake_u)
             id_loss = identity_loss(s_hat, s)
             total_s_loss = gen_s_loss * 0.5 +  gen_loss
-            total_u_loss = gen_loss
+            total_u_loss = gen_u_loss * 0.5 + gen_loss
             disentangle_loss = id_loss + total_s_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_u_generator = tape.gradient(total_u_loss, generator_u.trainable_variables)
@@ -307,6 +307,8 @@ if __name__ == '__main__':
         disentangle_t = disentanglement(blockSize)
         data_table = dataset(data, data_label)
         start_train(250, blockSize, data_table, file_directory)
+        '''
         data = pd.read_csv("./result/"+date+file_directory+"result")
         history = cls.training(data, 50)
         print(history)
+        '''

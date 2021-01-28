@@ -62,8 +62,6 @@ def training(data, blockSize):
         to_numpy().reshape(test_size, blockSize, 1, 2)
     train_labels = train_dataset.groupby('block').mean().labels
     test_labels = test_dataset.groupby('block').mean().labels
-
-    print(test_labels)
     classifier = cnn_classifier(blockSize)
     classifier.compile(optimizer='adam',
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
