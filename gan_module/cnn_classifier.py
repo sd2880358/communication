@@ -7,7 +7,7 @@ import seaborn as sns
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
-import gan_module.mlcTest as mlc
+import mlcTest as mlc
 
 
 
