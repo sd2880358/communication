@@ -233,8 +233,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print("result of fake mixed", fake_mixed[1,1,1])
             print("actual feature", feature[1,1,1])
             print("actual labels", labels[1,1,1])
-            discriminator_result = discriminator_d(fake_c)
-            print(generator_loss(discriminator_result))
+            test = discriminator_d(labels)
+            print(generator_loss(labels))
             fake_s = disentangle_t(feature)
 
             # relative loss between fake signal and signal_hat
