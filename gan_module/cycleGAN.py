@@ -11,7 +11,7 @@ import tensorflow_probability as tfp
 import time
 from IPython.display import clear_output
 import math
-import gan_module.cnn_classifier as cls
+import cnn_classifier as cls
 
 
 def dataset(dataFile, labelFile):
