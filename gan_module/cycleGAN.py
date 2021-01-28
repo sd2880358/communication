@@ -309,4 +309,4 @@ if __name__ == '__main__':
         start_train(250, blockSize, data_table, file_directory)
         data = pd.read_csv("./result/"+date+file_directory+"result")
         history = cls.training(data, 50)
-        print(history)
+        print(history.history)
