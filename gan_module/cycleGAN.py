@@ -145,7 +145,7 @@ def shuffle_data(my_table, blockSize):
     test_noise = tf.reshape(test_noise, (block, blockSize, 2, 1))
     symbol = my_table.loc[:, 'label']
     symbol = tf.reshape(symbol, (block, blockSize, 1))
-    return test_feature, test_label, symbol, test_noise
+    return test_feature, test_label, symbol, my_table
 
 
 def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
@@ -208,7 +208,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
     if ckpt_manager.latest_checkpoint:
         ckpt.restore(ckpt_manager.latest_checkpoint)
         print('Latest checkpoint restored!!')
-    feature, labels, symbol, noise = shuffle_data(data, BUFFER_SIZE)
+    feature, labels, symbol, my_table = shuffle_data(data, BUFFER_SIZE)
     train_f = tf.data.Dataset.from_tensor_slices(feature).batch(BATCH_SIZE)
     train_l = tf.data.Dataset.from_tensor_slices(labels).batch(BATCH_SIZE)
     for epoch in range(EPOCHS):
@@ -242,7 +242,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "fake_signal_real":fake_s.numpy()[:,:,0].flatten(),
                  "fake_signal_imag": fake_s.numpy()[:,:,1].flatten(),
                 "block":data_table.block,
-                "labels": symbol.numpy().flatten()}
+                "labels": my_table.cons.numpy().flatten()}
             )
             # relative loss between fake signal and signal_hat
             '''

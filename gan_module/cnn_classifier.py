@@ -53,6 +53,6 @@ def training(data, blockSize):
     classifier.compile(optimizer='adam',
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
-    history = classifier.fit(train_features, train_labels, epochs=100,batch_size=1,
+    history = classifier.fit(train_features, train_labels, epochs=100,
                         validation_data=(test_features, test_labels))
     return history
