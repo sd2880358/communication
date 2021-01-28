@@ -234,7 +234,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print("actual feature", feature[1,1,1])
             print("actual labels", labels[1,1,1])
             test = discriminator_d(labels)
-            print(test.mean())
+            print(test.numpy().mean())
             fake_s = disentangle_t(feature)
 
             # relative loss between fake signal and signal_hat
@@ -276,7 +276,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 100
+    EPOCHS = 10
     LAMBDA = 10
     date = "1_27/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
