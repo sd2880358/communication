@@ -234,7 +234,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print("actual feature", feature[1,1,1])
             print("actual labels", labels[1,1,1])
             test = discriminator_d(labels)
-            print(generator_loss(labels))
+            print(test.mean())
             fake_s = disentangle_t(feature)
 
             # relative loss between fake signal and signal_hat
