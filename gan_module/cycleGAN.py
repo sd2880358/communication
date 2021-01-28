@@ -239,8 +239,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_s = disentangle_t(feature)
             result = pd.DataFrame(
                   {
-                "fake_signal_real":labels.numpy()[:,:,0].flatten(),
-                 "fake_signal_imag": labels.numpy()[:,:,1].flatten(),
+                "fake_signal_real":feature.numpy()[:,:,0].flatten(),
+                 "fake_signal_imag": feature.numpy()[:,:,1].flatten(),
                 "block":data_table.block,
                 "labels": symbol.numpy().flatten()}
             )
