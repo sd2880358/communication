@@ -73,7 +73,7 @@ def build_and_compile_model(norm):
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
-        layers.Dense(2)
+        layers.Dense(20)
     ])
     model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   optimizer=tf.keras.optimizers.Adam(0.01),

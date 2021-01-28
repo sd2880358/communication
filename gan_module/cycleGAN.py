@@ -239,10 +239,10 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_s = disentangle_t(feature)
             result = pd.DataFrame(
                   {
-                "fake_signal_real":labels.numpy()[:,:,0].flatten(),
-                 "fake_signal_imag": labels.numpy()[:,:,1].flatten(),
+                "fake_signal_real":fake_s.numpy()[:,:,0].flatten(),
+                 "fake_signal_imag": fake_s.numpy()[:,:,1].flatten(),
                 "block":data_table.block,
-                "labels": my_table.cons.to_numpy().flatten()}
+                "labels": (my_table.cons.to_numpy()-1).flatten()}
             )
             # relative loss between fake signal and signal_hat
             '''
@@ -284,7 +284,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1
+    EPOCHS = 100
     LAMBDA = 10
     date = "1_27/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -309,4 +309,4 @@ if __name__ == '__main__':
         start_train(250, blockSize, data_table, file_directory)
         data = pd.read_csv("./result/"+date+file_directory+"result")
         history = cls.training(data, 50)
-        print(history.history)
+        print(history)
