@@ -62,8 +62,8 @@ def make_generator(blockSize):
     model = tf.keras.Sequential()
     model.add(layers.Conv2D(16, (1, 2), strides=(1, 2), activation="linear",
                             input_shape=(blockSize, 2, 1)))
-    model.add(layers.Conv2D(32, (1, 16), activation="linear", padding='same'))
-    model.add(layers.Conv2D(16, (1, 32), activation="linear", padding='same'))
+    model.add(layers.Conv2D(32, (1, 16), activation="relu", padding='same'))
+    model.add(layers.Conv2D(16, (1, 32), activation="relu", padding='same'))
     model.add(layers.Reshape((blockSize, 16, 1)))
     model.add(layers.AveragePooling2D((1, 8)))
     model.add(layers.Dense(1))
