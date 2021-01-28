@@ -47,13 +47,12 @@ def assign_labels(myTable):
 from numpy.random import default_rng
 
 
-def training_set(myTable):
-    block = myTable.shape[0]
+def training_set(myTable, block):
     rng = default_rng()
     sample_size = int(0.8 * block)
     numbers = rng.choice(range(1, block + 1), size=sample_size, replace=False)
     training_dataset = myTable[myTable.block.isin(numbers)]
-    return training_dataset
+    return sample_size, training_dataset
 
 def get_results(results):
     prediction_results = []
@@ -232,8 +231,9 @@ def cross_test(train_set, test_set, ori, cross, test_result):
     test_result = test_result.append(result)
     return [ori, cross, test_result]
 
-data = "my_data"
-label = "my_labels"
-test_data = dataset(data, label)
-test, result = get_train(test_data, 10)
-print(result)
+if __name__ == '__main__':
+    data = "my_data"
+    label = "my_labels"
+    test_data = dataset(data, label)
+    test, result = get_train(test_data, 10)
+    print(result)

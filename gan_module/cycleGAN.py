@@ -11,6 +11,7 @@ import tensorflow_probability as tfp
 import time
 from IPython.display import clear_output
 import math
+import gan_module.cnn_classifier as cls
 
 
 def dataset(dataFile, labelFile):
@@ -236,7 +237,13 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             test = discriminator_d(labels)
             print(test.numpy().mean())
             fake_s = disentangle_t(feature)
-
+            result = pd.DataFrame(
+                  {
+                "fake_signal_real":fake_s.numpy()[:,:,0].flatten(),
+                 "fake_signal_imag": fake_s.numpy()[:,:,1].flatten(),
+                "block":data_table.block,
+                "labels": symbol.numpy().flatten()}
+            )
             # relative loss between fake signal and signal_hat
             '''
             id_loss = abs(fake_s - fake_c).numpy().mean()
@@ -272,11 +279,12 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "disentangle loss": id_loss,
                 "relative loss": relative_loss
             }, index=[0])
+            new_table = result.to_csv("./result/" + date + filePath+"result", index=False)
             data.to_csv("./result/" + date + filePath)
 
 
 if __name__ == '__main__':
-    EPOCHS = 300
+    EPOCHS = 1
     LAMBDA = 10
     date = "1_27/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -299,3 +307,6 @@ if __name__ == '__main__':
         disentangle_t = disentanglement(blockSize)
         data_table = dataset(data, data_label)
         start_train(250, blockSize, data_table, file_directory)
+        data = pd.read_csv("./result/"+date+file_directory+"result")
+        history = cls.training(data, 50)
+        print(history.history)
