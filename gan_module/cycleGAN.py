@@ -292,7 +292,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             data = pd.DataFrame({
                 "disentangle loss": test_hist[:,0],
                 "relative loss": test_hist[:, 1]
-            }, index=[0])
+            })
             new_table = result.to_csv("./result/" + date + filePath+"result", index=False)
             data.to_csv("./result/" + date + filePath)
 
