@@ -191,7 +191,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         discriminator_d_optimizer.apply_gradients(
             zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
-    checkpoint_path = "./checkpoints/test6/" + date + filePath
+    checkpoint_path = "./checkpoints/test5/" + date + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_u=generator_u,
                                disentangle_t=disentangle_t,
