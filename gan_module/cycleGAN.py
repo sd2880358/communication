@@ -245,8 +245,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print("actual labels", labels[1,1,1])
             test = discriminator_d(labels)
             fake_s = disentangle_t(feature)
+            disen_hist.reverse()
             test_hist = np.array(disen_hist)
-            print("the tensor loss is ", test_hist)
             result = pd.DataFrame(
                   {
                 "real":feature.numpy()[:,:,0].flatten(),
