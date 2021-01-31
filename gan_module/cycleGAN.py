@@ -287,6 +287,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('The disentangle total loss is', id_loss)
             print('The relative loss is ', relative_loss)
             print("___________________\n")
+            print(test_hist)
             data = pd.DataFrame({
                 "disentangle loss": test_hist[:,0],
                 "relative loss": test_hist[:, 1]
