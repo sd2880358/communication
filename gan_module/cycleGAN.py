@@ -288,7 +288,6 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('The disentangle total loss is', id_loss)
             print('The relative loss is ', relative_loss)
             print("___________________\n")
-            print(test_hist)
             data = pd.DataFrame({
                 "disentangle loss": test_hist[:,0],
                 "relative loss": test_hist[:, 1]
@@ -298,7 +297,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1000
+    EPOCHS = 1
     LAMBDA = 10
     date = "1_31/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -312,7 +311,7 @@ if __name__ == '__main__':
         i = str(i)
         data = "my_data" + i
         data_label = "my_labels" + i
-        file_directory = 'method' + i
+        file_directory = 'method2'
         generator_s = make_generator(blockSize)
         generator_u = make_generator(blockSize)
         discriminator_t = make_discriminator_model(blockSize)
@@ -326,5 +325,5 @@ if __name__ == '__main__':
         modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
-        #cls.qam_training(modify, qam, 50, 100, "test1_qam")
-        #cls.symbol_training(modify, label, 50, 300, "test1_symbol")
+        cls.qam_training(modify, qam, 50, 100, "test1_qam")
+        cls.symbol_training(modify, label, 50, 300, "test1_symbol")
