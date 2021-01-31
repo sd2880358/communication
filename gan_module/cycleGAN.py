@@ -239,10 +239,13 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_s = disentangle_t(feature)
             result = pd.DataFrame(
                   {
-                "fake_signal_real":feature.numpy()[:,:,0].flatten(),
-                 "fake_signal_imag": feature.numpy()[:,:,1].flatten(),
+                "real":feature.numpy()[:,:,0].flatten(),
+                "imag": feature.numpy()[:,:,1].flatten(),
+                "fake_real": fake_s.numpy()[:, :, 0].flatten(),
+                "fake_imag": fake_s.numpy()[:,:, 1].flatten(),
                 "block":data_table.block,
-                "labels": (my_table.cons.to_numpy()-1).flatten()}
+                "cons": (my_table.cons.to_numpy()-1).flatten(),
+                "labels": (my_table.label.to_numpy()).flatten()}
             )
             # relative loss between fake signal and signal_hat
             '''
@@ -284,9 +287,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1
+    EPOCHS = 300
     LAMBDA = 10
-    date = "1_27/"
+    date = "1_31/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_u_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -308,5 +311,9 @@ if __name__ == '__main__':
         data_table = dataset(data, data_label)
         start_train(250, blockSize, data_table, file_directory)
         data = pd.read_csv("./result/"+date+file_directory+"result")
-        history = cls.training(data, 50)
-        print(history.history)
+        baseline = data.loc[:, ["real", "imag", "block"]]
+        modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
+        qam = data.loc[:, ["cons"]]
+        label = data.loc[:, ["labels"]]
+        cls.qam_training(baseline, qam, 50, 100, "baseline_qam")
+        cls.symbol_training(baseline, label, 50, 100, "baseline_symbol")
