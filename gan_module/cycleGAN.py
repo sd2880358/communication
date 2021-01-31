@@ -225,7 +225,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_s = disentangle_t(feature)
             id_loss = abs(fake_s - labels).numpy().mean()
             relative_loss = np.median(abs((labels - fake_s) / labels))
-            disen_Loss = [[id_loss],[relative_loss]]
+            disen_Loss = [id_loss,relative_loss]
             disen_hist.append(disen_Loss)
             print(disen_hist)
 
@@ -245,10 +245,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print("actual feature", feature[1,1,1])
             print("actual labels", labels[1,1,1])
             test = discriminator_d(labels)
-            print(test.numpy().mean())
             fake_s = disentangle_t(feature)
-            print("the tensor loss is ", disen_hist)
             test_hist = np.array(disen_hist)
+            print("the tensor loss is ", test_hist)
             result = pd.DataFrame(
                   {
                 "real":feature.numpy()[:,:,0].flatten(),
