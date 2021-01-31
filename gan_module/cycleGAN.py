@@ -315,5 +315,5 @@ if __name__ == '__main__':
         modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
-        cls.qam_training(baseline, qam, 50, 100, "baseline_qam")
-        cls.symbol_training(baseline, label, 50, 300, "baseline_symbol")
+        #cls.qam_training(baseline, qam, 50, 100, "baseline_qam")
+        #cls.symbol_training(baseline, label, 50, 300, "baseline_symbol")
