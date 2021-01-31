@@ -211,10 +211,10 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
     feature, labels, symbol, my_table = shuffle_data(data, BUFFER_SIZE)
     train_f = tf.data.Dataset.from_tensor_slices(feature).batch(BATCH_SIZE)
     train_l = tf.data.Dataset.from_tensor_slices(labels).batch(BATCH_SIZE)
+    disen_hist = []
     for epoch in range(EPOCHS):
         start = time.time()
         n = 0
-        disen_hist = []
         for i, j in tf.data.Dataset.zip((train_f, train_l)):
             train_step(i, j)
         if n % 10 == 0:
@@ -227,75 +227,74 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             relative_loss = np.median(abs((labels - fake_s) / labels))
             disen_Loss = [[id_loss],[relative_loss]]
             disen_hist.append(disen_Loss)
-            print(disen_hist)
 
-            if epoch - 1 == 0:
+        if epoch - 1 == 0:
 
-                # measuring the absolute loss between generator and disentanglement
+            ## measuring the absolute loss between generator and disentanglement
 
-                g_noise = tf.random.normal([BATCH_SIZE, blockSize, 2, 1])
-                fake_c = generator_s(g_noise)
-                fake_u = generator_u(g_noise)
-                print("result of signal and interference")
-                print("---")
-                print("result of fake signal", fake_c[1,1,1])
-                print("result of fake unknown", fake_u[1,1,1])
-                fake_mixed = fake_c + fake_u
-                print("result of fake mixed", fake_mixed[1,1,1])
-                print("actual feature", feature[1,1,1])
-                print("actual labels", labels[1,1,1])
-                test = discriminator_d(labels)
-                print(test.numpy().mean())
-                fake_s = disentangle_t(feature)
-                test_hist = np.array(disen_hist)
-                result = pd.DataFrame(
-                      {
-                    "real":feature.numpy()[:,:,0].flatten(),
-                    "imag": feature.numpy()[:,:,1].flatten(),
-                    "fake_real": fake_s.numpy()[:, :, 0].flatten(),
-                    "fake_imag": fake_s.numpy()[:,:, 1].flatten(),
-                    "block":data_table.block,
-                    "cons": (my_table.cons.to_numpy()-1).flatten(),
-                    "labels": (my_table.label.to_numpy()).flatten()}
-                )
-                # relative loss between fake signal and signal_hat
-                '''
-                id_loss = abs(fake_s - fake_c).numpy().mean()
-                relative_loss = np.median(abs((fake_s - fake_c) / fake_c))
-                '''
-                id_loss = abs(fake_s - labels).numpy().mean()
-                relative_loss = np.median(abs((labels - fake_s) / labels))
-                '''
-                sample = tf.random.normal([1000, blockSize, 2, 1])
-                fake_s = generator_s(sample)
-                fake_i = generator_i(sample)
-                fake_n = generator_n(sample)
-                fake_mixed = fake_s + fake_i + fake_n
-                print(fake_mixed[:,1,1])
-                fake_t = discriminator_t(fake_mixed)
-                fake_d = discriminator_d(fake_s)
-                gen_total_loss = generator_loss(fake_t)
-                gen_s_loss = generator_loss(fake_d)
-                print(gen_total_loss)
-                print(gen_s_loss)
-                '''
-                print("_____Test Result:_____")
-                ckpt_save_path = ckpt_manager.save()
-                print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
-                                                                    ckpt_save_path))
+            g_noise = tf.random.normal([BATCH_SIZE, blockSize, 2, 1])
+            fake_c = generator_s(g_noise)
+            fake_u = generator_u(g_noise)
+            print("result of signal and interference")
+            print("---")
+            print("result of fake signal", fake_c[1,1,1])
+            print("result of fake unknown", fake_u[1,1,1])
+            fake_mixed = fake_c + fake_u
+            print("result of fake mixed", fake_mixed[1,1,1])
+            print("actual feature", feature[1,1,1])
+            print("actual labels", labels[1,1,1])
+            test = discriminator_d(labels)
+            print(test.numpy().mean())
+            fake_s = disentangle_t(feature)
+            test_hist = np.array(disen_hist)
+            result = pd.DataFrame(
+                  {
+                "real":feature.numpy()[:,:,0].flatten(),
+                "imag": feature.numpy()[:,:,1].flatten(),
+                "fake_real": fake_s.numpy()[:, :, 0].flatten(),
+                "fake_imag": fake_s.numpy()[:,:, 1].flatten(),
+                "block":data_table.block,
+                "cons": (my_table.cons.to_numpy()-1).flatten(),
+                "labels": (my_table.label.to_numpy()).flatten()}
+            )
+            # relative loss between fake signal and signal_hat
+            '''
+            id_loss = abs(fake_s - fake_c).numpy().mean()
+            relative_loss = np.median(abs((fake_s - fake_c) / fake_c))
+            '''
+            id_loss = abs(fake_s - labels).numpy().mean()
+            relative_loss = np.median(abs((labels - fake_s) / labels))
+            '''
+            sample = tf.random.normal([1000, blockSize, 2, 1])
+            fake_s = generator_s(sample)
+            fake_i = generator_i(sample)
+            fake_n = generator_n(sample)
+            fake_mixed = fake_s + fake_i + fake_n
+            print(fake_mixed[:,1,1])
+            fake_t = discriminator_t(fake_mixed)
+            fake_d = discriminator_d(fake_s)
+            gen_total_loss = generator_loss(fake_t)
+            gen_s_loss = generator_loss(fake_d)
+            print(gen_total_loss)
+            print(gen_s_loss)
+            '''
+            print("_____Test Result:_____")
+            ckpt_save_path = ckpt_manager.save()
+            print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
+                                                                ckpt_save_path))
 
-                print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
-                                                                   time.time() - start))
-                print('The disentangle total loss is', id_loss)
-                print('The relative loss is ', relative_loss)
-                print("___________________\n")
-                print(test_hist)
-                data = pd.DataFrame({
-                    "disentangle loss": test_hist[:,0],
-                    "relative loss": test_hist[:, 1]
-                }, index=[0])
-                new_table = result.to_csv("./result/" + date + filePath+"result", index=False)
-                data.to_csv("./result/" + date + filePath)
+            print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
+                                                               time.time() - start))
+            print('The disentangle total loss is', id_loss)
+            print('The relative loss is ', relative_loss)
+            print("___________________\n")
+            print(test_hist)
+            data = pd.DataFrame({
+                "disentangle loss": test_hist[:,0],
+                "relative loss": test_hist[:, 1]
+            }, index=[0])
+            new_table = result.to_csv("./result/" + date + filePath+"result", index=False)
+            data.to_csv("./result/" + date + filePath)
 
 
 if __name__ == '__main__':
