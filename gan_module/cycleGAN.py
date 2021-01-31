@@ -215,6 +215,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         start = time.time()
         n = 0
         disen_hist = []
+        globals(disen_hist)
         for i, j in tf.data.Dataset.zip((train_f, train_l)):
             train_step(i, j)
         if n % 10 == 0:
@@ -227,6 +228,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             relative_loss = np.median(abs((labels - fake_s) / labels))
             disen_Loss = [[id_loss],[relative_loss]]
             disen_hist.append(disen_Loss)
+
         if epoch - 1 == 0:
 
             ## measuring the absolute loss between generator and disentanglement
