@@ -28,8 +28,11 @@ def qam_classifier(blocksize):
 def symbol_classifier(blocksize):
     model = keras.Sequential()
     model.add(layers.Conv2D(16, (1, 2), padding='same', activation='relu', input_shape=(blocksize, 1, 2)))
-    model.add(layers.Conv2D(32, 3, padding='same', activation='relu'))
-    model.add(layers.Conv2D(64, 3, padding='same', activation='relu'))
+    model.add(layers.AveragePooling2D((1, 1)))
+    model.add(layers.Conv2D(32, (4,1), padding='same', activation='relu'))
+    model.add(layers.AveragePooling2D((1, 1)))
+    model.add(layers.Conv2D(64, (4,1), padding='same', activation='relu'))
+    model.add(layers.AveragePooling2D((1, 1)))
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(20))
     return model
