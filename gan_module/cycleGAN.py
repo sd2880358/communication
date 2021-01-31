@@ -171,8 +171,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disc_d_loss = discriminator_loss(real_d, fake_d)
             disc_u_loss = discriminator_loss(result_real_u, result_fake_u)
             id_loss = identity_loss(s_hat, s)
-            total_s_loss = gen_s_loss +  gen_loss
-            total_u_loss = gen_u_loss + gen_loss
+            total_s_loss = gen_s_loss * 0.5 +  gen_loss
+            total_u_loss = gen_u_loss * 0.5 + gen_loss
             disentangle_loss = id_loss + total_s_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_u_generator = tape.gradient(total_u_loss, generator_u.trainable_variables)
@@ -311,7 +311,7 @@ if __name__ == '__main__':
         i = str(i)
         data = "my_data" + i
         data_label = "my_labels" + i
-        file_directory = 'method2'
+        file_directory = 'method1'
         generator_s = make_generator(blockSize)
         generator_u = make_generator(blockSize)
         discriminator_t = make_discriminator_model(blockSize)
@@ -325,5 +325,5 @@ if __name__ == '__main__':
         modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
-        cls.qam_training(modify, qam, 50, 100, "test2_qam")
-        cls.symbol_training(modify, label, 50, 300, "test2_symbol")
+        cls.qam_training(modify, qam, 50, 100, "test1_qam")
+        cls.symbol_training(modify, label, 50, 300, "test1_symbol")
