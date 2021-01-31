@@ -171,8 +171,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disc_d_loss = discriminator_loss(real_d, fake_d)
             disc_u_loss = discriminator_loss(result_real_u, result_fake_u)
             id_loss = identity_loss(s_hat, s)
-            total_s_loss = gen_s_loss * 0.5 +  gen_loss
-            total_u_loss = gen_u_loss * 0.5 + gen_loss
+            total_s_loss = gen_s_loss +  gen_loss
+            total_u_loss = gen_u_loss + gen_loss
             disentangle_loss = id_loss + total_s_loss
         gradients_of_s_generator = tape.gradient(total_s_loss, generator_s.trainable_variables)
         gradients_of_u_generator = tape.gradient(total_u_loss, generator_u.trainable_variables)
@@ -191,7 +191,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         discriminator_d_optimizer.apply_gradients(
             zip(gradients_of_discriminator_d, discriminator_d.trainable_variables))
 
-    checkpoint_path = "./checkpoints/test5/" + date + filePath
+    checkpoint_path = "./checkpoints/test6/" + date + filePath
     ckpt = tf.train.Checkpoint(generator_s=generator_s,
                                generator_u=generator_u,
                                disentangle_t=disentangle_t,
@@ -287,7 +287,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1
+    EPOCHS = 100
     LAMBDA = 10
     date = "1_31/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -315,5 +315,5 @@ if __name__ == '__main__':
         modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
-        cls.qam_training(modify, qam, 50, 100, "test1_qam")
-        cls.symbol_training(modify, label, 50, 300, "test1_symbol")
+        #cls.qam_training(modify, qam, 50, 100, "test1_qam")
+        #cls.symbol_training(modify, label, 50, 300, "test1_symbol")
