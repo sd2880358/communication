@@ -288,8 +288,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print('The relative loss is ', relative_loss)
             print("___________________\n")
             data = pd.DataFrame({
-                "disentangle loss": disen_hist[0,:],
-                "relative loss": disen_hist[1, :]
+                "disentangle loss": disen_hist[:,0],
+                "relative loss": disen_hist[:, 1]
             }, index=[0])
             new_table = result.to_csv("./result/" + date + filePath+"result", index=False)
             data.to_csv("./result/" + date + filePath)
