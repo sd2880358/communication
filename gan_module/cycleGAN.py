@@ -215,7 +215,6 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         start = time.time()
         n = 0
         disen_hist = []
-        globals(disen_hist)
         for i, j in tf.data.Dataset.zip((train_f, train_l)):
             train_step(i, j)
         if n % 10 == 0:
