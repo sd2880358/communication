@@ -297,7 +297,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 10000
+    EPOCHS = 1
     LAMBDA = 10
     date = "1_31/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -326,4 +326,4 @@ if __name__ == '__main__':
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
         cls.qam_training(modify, qam, 50, 100, "test1_qam")
-        cls.symbol_training(modify, label, 50, 300, "test1_symbol")
+        cls.symbol_training(modify, label, 50, 1000, "test1_symbol")
