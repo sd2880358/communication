@@ -68,7 +68,7 @@ def make_generator(blockSize):
     model.add(layers.AveragePooling2D((1, 1)))
     model.add(layers.Conv2D(16, (1, 32), activation="relu", padding='same'))
     model.add(layers.Reshape((blockSize, 16, 1)))
-    model.add(layers.AveragePooling2D((1, 1)))
+    model.add(layers.AveragePooling2D((1, 8)))
     model.add(layers.Dense(1))
     return model
 
