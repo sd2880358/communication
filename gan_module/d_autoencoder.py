@@ -18,13 +18,13 @@ class Denoise(Model):
         self.blockSize = blockSize
         self.encoder = tf.keras.Sequential([
             layers.Input(shape=(blockSize, 2, 1)),
-            layers.Conv2D(16, (5, 2), strides=(5, 2), activation="relu", padding='same'),
+            layers.Conv2D(16, (1, 2), strides=(1, 2), activation="relu", padding='same'),
             layers.AveragePooling2D((1, 1)),
-            layers.Conv2D(8, (5, 1), strides=(5, 1), activation="relu", padding='same'),
+            layers.Conv2D(8, (1, 1), strides=(1, 1), activation="relu", padding='same'),
         ])
         self.decoder = tf.keras.Sequential([
-            layers.Conv2DTranspose(8, kernel_size=(5, 1), strides=(5, 1), activation='relu', padding='same'),
-            layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(5, 2), activation='relu', padding='same'),
+            layers.Conv2DTranspose(8, kernel_size=(1, 1), strides=(1, 1), activation='relu', padding='same'),
+            layers.Conv2DTranspose(16, kernel_size=(1, 2), strides=(1, 2), activation='relu', padding='same'),
             layers.Conv2D(1, kernel_size=(3, 3), activation='relu', padding='same')
         ])
     def call(self, x):
