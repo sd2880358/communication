@@ -25,7 +25,7 @@ class Denoise(Model):
         self.decoder = tf.keras.Sequential([
             layers.Conv2DTranspose(8, kernel_size=(5, 1), strides=(5, 1), activation='relu', padding='same'),
             layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(5, 2), activation='relu', padding='same'),
-            layers.Conv2D(1, kernel_size=(3, 3), activation='sigmoid', padding='same')
+            layers.Conv2D(1, kernel_size=(3, 3), activation='relu', padding='same')
         ])
     def call(self, x):
         encoded = self.encoder(x)
