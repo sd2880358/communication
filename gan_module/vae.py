@@ -25,8 +25,8 @@ class CVAE(Model):
         self.latent_dim = latent_dim
         self.gamma = 100
         encoder_input = layers.Input(shape=input_shape)
-        X = layers.Conv2D(16, (5, 2), strides=(2, 2), activation="relu", padding='same')(encoder_input)
-        X = layers.Conv2D(8, (5, 1), activation="relu", padding='same')(X)
+        X = layers.Conv2D(4, (5, 2), strides=(2, 2), activation="relu", padding='same')(encoder_input)
+        X = layers.Conv2D(2, (5, 1), activation="relu", padding='same')(X)
         X = layers.Flatten()(X)
         Z_mu = layers.Dense(self.latent_dim)(X)
         Z_logvar = layers.Dense(self.latent_dim, activation='relu')(X)
