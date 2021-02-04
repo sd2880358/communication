@@ -61,15 +61,12 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (5, 2), strides=(2, 2), activation="relu", padding='same',
+    model.add(layers.Conv2D(16, (5, 2), strides=(2, 2), activation="linear", padding='same',
                             input_shape=(blockSize, 2, 1)))
-    model.add(layers.Conv2D(8, (5, 1), activation="relu", padding='same'))
-    model.add(layers.Flatten())
-    model.add(layers.Dense(50))
-    model.add(layers.Reshape([25,2,1]))
-    model.add(layers.Conv2DTranspose(8, kernel_size=(5, 1), activation='relu', padding='same'))
-    model.add(layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(2, 1), activation='relu', padding='same'))
-    model.add(layers.Conv2D(1, kernel_size=(3, 3), activation='relu', padding='same'))
+    model.add(layers.Conv2D(8, (5, 1), activation="linear", padding='same'))
+    model.add(layers.Conv2DTranspose(8, kernel_size=(5, 1), activation='linear', padding='same'))
+    model.add(layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(2, 2), activation='linear', padding='same'))
+    model.add(layers.Conv2D(1, kernel_size=(3, 3), activation='linear', padding='same'))
     return model
 
 
@@ -294,7 +291,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "disentangle loss": test_hist[:,0],
                 "relative loss": test_hist[:, 1]
             })
-            new_table = result.to_csv("./result/" + date + filePath+"result", index=False)
+            result.to_csv("./result/" + date + filePath+"result", index=False)
             data.to_csv("./result/" + date + filePath)
 
 
