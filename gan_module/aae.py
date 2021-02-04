@@ -103,7 +103,7 @@ def generator_loss(fake_output):
 
 
 def identity_loss(real, fake):
-    loss =  tf.mean_square_loss(tf.abs(real - fake))
+    loss =  mean_square_loss(tf.abs(real - fake))
     return LAMBDA * 0.5 * loss
 
 
