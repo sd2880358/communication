@@ -28,18 +28,13 @@ class CVAE(Model):
         X = layers.Conv2D(16, (5, 2), strides=(2, 2), activation="relu", padding='same')(encoder_input)
         X = layers.Conv2D(8, (5, 1), activation="relu", padding='same')(X)
         X = layers.Flatten()(X)
-        X = layers.Dense(256, activation='relu')(X)
-        X = layers.Dense(256, activation='relu')(X)
         Z_mu = layers.Dense(self.latent_dim)(X)
         Z_logvar = layers.Dense(self.latent_dim, activation='relu')(X)
         Z = Reparameterize()([Z_mu, Z_logvar])
 
 
         decode_input = layers.Input(shape=latent_dim)
-        X = layers.Dense(25, activation='relu')(decode_input)
-        X = layers.Dense(25, activation='relu')(X)
-        X = layers.Dense(50, activation='relu')(X)
-        X = layers.Reshape((25,1,2))(X)
+        X = layers.Reshape((25,1,2))(decode_input)
         X = layers.Conv2DTranspose(2, kernel_size=(5, 1), activation='relu', padding='same')(X)
         X = layers.Conv2DTranspose(4, kernel_size=(5, 2), strides=(2, 2), activation='relu', padding='same')(X)
         decode_output = layers.Conv2D(1, kernel_size=(3, 3), activation='relu', padding='same')(X)
@@ -110,7 +105,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
                                                                 ckpt_save_path))
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                                time.time() - start))
-            print(error)
+            print(predicted)
 
 
 
