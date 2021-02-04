@@ -97,14 +97,14 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
     for epoch in range(epochs):
         start = time.time()
         n = 0
-        for i, j in tf.data.Dataset.zip((train_f, train_l)):
+        for i, j in tf.data.Dataset.zip((train_f, train_f)):
             train_step(i, j)
         if n % 10 == 0:
             print('.', end='')
             n += 1
         if epoch % 10 == 0:
             predicted = model.vae.predict(feature)
-            error = reconstruction_loss(labels, predicted, input_shape)
+            error = reconstruction_loss(feature, predicted, input_shape)
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
