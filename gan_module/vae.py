@@ -3,8 +3,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-from sklearn.model_selection import train_test_split
+
 from tensorflow.keras import layers, losses
 from tensorflow.keras.datasets import fashion_mnist
 from tensorflow.keras.models import Model
@@ -103,7 +102,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
         if n % 10 == 0:
             print('.', end='')
             n += 1
-        if epoch == epochs-1:
+        if epoch % 10 == 0:
             predicted = model.vae.predict(feature)
             error = reconstruction_loss(labels, predicted, input_shape)
             ckpt_save_path = ckpt_manager.save()
