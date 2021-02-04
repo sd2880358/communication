@@ -61,15 +61,15 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (1, 2), strides=(1, 2), activation="linear",
+    model.add(layers.Conv2D(16, (5, 2), strides=(2, 2), activation="relu", padding='same',
                             input_shape=(blockSize, 2, 1)))
-    model.add(layers.AveragePooling2D((1, 1)))
-    model.add(layers.Conv2D(32, (1, 16), activation="relu", padding='same'))
-    model.add(layers.AveragePooling2D((1, 1)))
-    model.add(layers.Conv2D(16, (1, 32), activation="relu", padding='same'))
-    model.add(layers.Reshape((blockSize, 16, 1)))
-    model.add(layers.AveragePooling2D((1, 8)))
-    model.add(layers.Dense(1))
+    model.add(layers.Conv2D(8, (5, 1), activation="relu", padding='same'))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(50))
+    model.add(layers.Reshape([25,2,1]))
+    model.add(layers.Conv2DTranspose(8, kernel_size=(5, 1), activation='relu', padding='same'))
+    model.add(layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(2, 1), activation='relu', padding='same'))
+    model.add(layers.Conv2D(1, kernel_size=(3, 3), activation='relu', padding='same'))
     return model
 
 
@@ -119,7 +119,7 @@ def noise_loss(noise_output):
 
 
 def identity_loss(real, fake):
-    loss = mean_abs_loss(real, fake)
+    loss =  tf.reduce_mean(tf.abs(real - fake))
     return LAMBDA * 0.5 * loss
 
 

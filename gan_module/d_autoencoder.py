@@ -18,14 +18,14 @@ class Denoise(Model):
         self.blockSize = blockSize
         self.encoder = tf.keras.Sequential([
             layers.Input(shape=(blockSize, 2, 1)),
-            layers.Conv2D(4, (5, 2), strides=(2, 2), activation="relu", padding='same'),
+            layers.Conv2D(16, (5, 2), strides=(2, 2), activation="linear", padding='same'),
             layers.AveragePooling2D((1, 1)),
-            layers.Conv2D(2, (5, 1), activation="relu", padding='same'),
+            layers.Conv2D(8, (5, 1), activation="linear", padding='same'),
         ])
         self.decoder = tf.keras.Sequential([
-            layers.Conv2DTranspose(2, kernel_size=(5, 1), activation='relu', padding='same'),
-            layers.Conv2DTranspose(4, kernel_size=(5, 2), strides=(2, 2), activation='relu', padding='same'),
-            layers.Conv2D(1, kernel_size=(3, 3), activation='relu', padding='same')
+            layers.Conv2DTranspose(8, kernel_size=(5, 1), activation='linear', padding='same'),
+            layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(2, 2), activation='linear', padding='same'),
+            layers.Conv2D(1, kernel_size=(3, 3), activation='linear', padding='same')
         ])
     def call(self, x):
         encoded = self.encoder(x)
@@ -43,7 +43,7 @@ def train(data, blockSize, date):
     history = autoencoder.fit(test_feature, test_label, epochs=100, verbose=0)
     hist = pd.DataFrame(history.history)
     hist.to_csv("./result/" + date + "/result")
-    return history
+    print(autoencoder.predict(test_feature))
 
 
 if __name__ == '__main__':
