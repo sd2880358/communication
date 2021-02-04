@@ -87,7 +87,7 @@ def make_discriminator_model(blockSize):
 
 
 cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-mean_square_loss = tf.keras.losses.MeanSquaredError()
+mean_abs_loss = tf.keras.losses.MeanSquaredError()
 
 
 def discriminator_loss(real_output, fake_output):
@@ -102,8 +102,9 @@ def generator_loss(fake_output):
 
 
 
+
 def identity_loss(real, fake):
-    loss =  mean_square_loss(tf.abs(real - fake))
+    loss =  mean_abs_loss(real , fake)
     return LAMBDA * 0.5 * loss
 
 
