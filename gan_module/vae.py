@@ -25,19 +25,19 @@ class CVAE(Model):
         self.latent_dim = latent_dim
         self.gamma = 100
         encoder_input = layers.Input(shape=input_shape)
-        X = layers.Conv2D(4, (5, 2), strides=(2, 2), activation="relu", padding='same')(encoder_input)
-        X = layers.Conv2D(2, (5, 1), activation="relu", padding='same')(X)
+        X = layers.Conv2D(16, (5, 2), strides=(2, 2), activation="linear", padding='same')(encoder_input)
+        X = layers.Conv2D(8, (5, 1), activation="linear", padding='same')(X)
         X = layers.Flatten()(X)
         Z_mu = layers.Dense(self.latent_dim)(X)
-        Z_logvar = layers.Dense(self.latent_dim, activation='relu')(X)
+        Z_logvar = layers.Dense(self.latent_dim, activation='linear')(X)
         Z = Reparameterize()([Z_mu, Z_logvar])
 
 
         decode_input = layers.Input(shape=latent_dim)
-        X = layers.Reshape((25,1,2))(decode_input)
-        X = layers.Conv2DTranspose(2, kernel_size=(5, 1), activation='relu', padding='same')(X)
-        X = layers.Conv2DTranspose(4, kernel_size=(5, 2), strides=(2, 2), activation='relu', padding='same')(X)
-        decode_output = layers.Conv2D(1, kernel_size=(3, 3), activation='relu', padding='same')(X)
+        X = layers.Reshape((25,1,8))(decode_input)
+        X = layers.Conv2DTranspose(8, kernel_size=(5, 1), activation='linear', padding='same')(X)
+        X = layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(2, 2), activation='linear', padding='same')(X)
+        decode_output = layers.Conv2D(1, kernel_size=(3, 3), activation='linear', padding='same')(X)
         self.encoder = Model(encoder_input, [Z_mu, Z_logvar, Z])
         self.decoder = Model(decode_input, decode_output)
         self.vae = Model(encoder_input, self.decoder(Z))
@@ -97,15 +97,17 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
             print('.', end='')
             n += 1
         if epoch % 100 == 0:
-            Z_mu, Z_logvar, Z = model.encoder(feature)
             #error = reconstruction_loss(feature, predicted, input_shape)
             pred = model.predict(feature)
+            error = tf.losses.MeanSquaredError()(pred, feature)
+            relative_error = np.median(abs((pred-feature) / feature))
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                                time.time() - start))
-            print(pred)
+            print(error)
+            print(relative_error)
 
 
 
@@ -119,7 +121,7 @@ if __name__ == '__main__':
     data_label = "my_labels1"
     file_path = "beta_vae"
     data = cycle.dataset(file_name, data_label)
-    model = CVAE(input_shape=(50,2,1), latent_dim=50)
+    model = CVAE(input_shape=(50,2,1), latent_dim=200)
     encoder = model.encoder
     decoder = model.decoder
     epochs = 1
