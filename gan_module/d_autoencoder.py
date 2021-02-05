@@ -35,8 +35,8 @@ class Denoise(Model):
         return decoded
 
 def relative_loss(X, X_pred):
-    abs = tf.losses.MeanAbsolutePercentageError()
-    return abs(X, X_pred)/100
+    loss = np.mean(abs((X - X_pred) / X_pred))
+    return loss
 
 
 
@@ -54,10 +54,11 @@ def train(data, blockSize, date, epochs):
     test_labels = test_dataset.loc[:, ['label_real', 'label_imag']].\
         to_numpy().reshape(test_size, blockSize, 2, 1)
     autoencoder = Denoise(blockSize)
-    autoencoder.compile(optimizer="adam", loss=losses.MeanSquaredError(), metrics=[relative_loss])
+    autoencoder.compile(optimizer="adam", loss=losses.MeanSquaredError())
 
     history = autoencoder.fit(train_features, train_labels,
-                              shuffle=True, epochs=epochs, verbose=0)
+                              shuffle=True, epochs=epochs, verbose=0,
+                              validation_data=(test_features, test_labels))
     hist = pd.DataFrame(history.history)
     hist.to_csv("./result/" + date + "/losses")
     feature, labels, symbol, my_table = cycle.shuffle_data(data, blockSize)
@@ -72,6 +73,7 @@ def train(data, blockSize, date, epochs):
             "cons": (my_table.cons.to_numpy() - 1).flatten(),
             "labels": (my_table.label.to_numpy()).flatten()}
     )
+    print(relative_loss(prediction, labels))
     result.to_csv("./result/" + date + "result", index=False)
 
 
