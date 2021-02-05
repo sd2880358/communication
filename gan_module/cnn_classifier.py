@@ -94,5 +94,5 @@ def symbol_training(feature, symbol, blockSize, epochs, name, date):
     history = classifier.fit(train_features, train_labels, epochs=epochs, verbose=0,
                         validation_data=(test_features, test_labels))
     hist = pd.DataFrame(history.history)
-    hist.to_csv("./result/" + date + + name)
+    hist.to_csv("./result/" + date + name)
     return history

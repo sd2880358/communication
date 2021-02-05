@@ -33,8 +33,8 @@ class Denoise(Model):
         return decoded
 
 def relative_loss(X, X_pred):
-    loss = np.mean(abs((X - X_pred) / X_pred))
-    return loss
+    loss = tf.losses.MeanAbsolutePercentageError()
+    return loss(X, X_pred)/100/50
 
 
 
@@ -52,7 +52,7 @@ def train(data, blockSize, date, epochs):
     test_labels = test_dataset.loc[:, ['label_real', 'label_imag']].\
         to_numpy().reshape(test_size, blockSize, 2, 1)
     autoencoder = Denoise(blockSize)
-    autoencoder.compile(optimizer="adam", loss=losses.MeanSquaredError())
+    autoencoder.compile(optimizer="adam", loss=losses.MeanSquaredError(), metrics=[relative_loss])
 
     history = autoencoder.fit(train_features, train_labels,
                               shuffle=True, epochs=epochs, verbose=0,
