@@ -87,5 +87,5 @@ if __name__ == '__main__':
     modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
     qam = data.loc[:, ["cons"]]
     label = data.loc[:, ["labels"]]
-    cls.qam_training(modify, qam, 50, 100, "test1_qam")
-    cls.symbol_training(modify, label, 50, 1000, "test1_symbol")
+    cls.qam_training(modify, qam, 50, 100, "test1_qam", date)
+    cls.symbol_training(modify, label, 50, 1000, "test1_symbol", date)

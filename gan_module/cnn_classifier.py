@@ -53,7 +53,7 @@ def cnn_classifier(blockSize):
 '''
 
 
-def qam_training(feature, qam, blockSize, epochs, name):
+def qam_training(feature, qam, blockSize, epochs, name, date):
     data = pd.concat([feature, qam], axis=1)
     block = int(data.shape[0]/blockSize)
     sample_size, train_dataset = mlc.training_set(data, block)
@@ -72,10 +72,10 @@ def qam_training(feature, qam, blockSize, epochs, name):
     history = classifier.fit(train_features, train_labels, epochs=epochs, verbose=0,
                         validation_data=(test_features, test_labels))
     hist = pd.DataFrame(history.history)
-    hist.to_csv("./result/1_31/" + name)
+    hist.to_csv("./result/" + date + name)
     return history
 
-def symbol_training(feature, symbol, blockSize, epochs, name):
+def symbol_training(feature, symbol, blockSize, epochs, name, date):
     data = pd.concat([feature, symbol], axis=1)
     block = int(data.shape[0]/blockSize)
     sample_size, train_dataset = mlc.training_set(data, block)
@@ -94,5 +94,5 @@ def symbol_training(feature, symbol, blockSize, epochs, name):
     history = classifier.fit(train_features, train_labels, epochs=epochs, verbose=0,
                         validation_data=(test_features, test_labels))
     hist = pd.DataFrame(history.history)
-    hist.to_csv("./result/1_31/" + name)
+    hist.to_csv("./result/" + date + + name)
     return history
