@@ -69,11 +69,11 @@ def loss(X, X_pred):
 def log_normal_pdf(sample, mean, logvar, raxis=1):
     log2pi = tf.math.log(2. * np.pi)
     return tf.reduce_sum(
-        -.5 * ((sample - mean) ** 2. * tf.exp(logvar) + logvar + log2pi)
+        -.5 * abs((sample - mean)  * tf.exp(logvar) + logvar + log2pi)
     )
 
 
-def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
+def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
     C = 0
     gamma = 100
 
