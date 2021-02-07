@@ -276,7 +276,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1
+    EPOCHS = 1000
     LAMBDA = 50
     date = "2_7/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -290,7 +290,7 @@ if __name__ == '__main__':
         i = str(i)
         data = "my_data" + i
         data_label = "my_labels" + i
-        file_directory = 'method1'
+        file_directory = 'AAE'
         generator_s = make_generator(blockSize)
         generator_u = make_generator(blockSize)
         discriminator_t = make_discriminator_model(blockSize)
