@@ -39,6 +39,7 @@ def relative_loss(X, X_pred):
 
 
 def train(data, blockSize, date, epochs):
+
     blocks = int(data.shape[0]/blockSize)
     sample_size, train_dataset = mlc.training_set(data, blocks)
     test_size = blocks - sample_size
@@ -53,7 +54,12 @@ def train(data, blockSize, date, epochs):
         to_numpy().reshape(test_size, blockSize, 2, 1)
     autoencoder = Denoise(blockSize)
     autoencoder.compile(optimizer="adam", loss=losses.MeanSquaredError(), metrics=[relative_loss])
-
+    checkpoint_path = "./checkpoints/test4/" + date
+    ckpt = tf.train.Checkpoint(autoencoder=autoencoder)
+    ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
+    if ckpt_manager.latest_checkpoint:
+        ckpt.restore(ckpt_manager.latest_checkpoint)
+        print('Latest checkpoint restored!!')
     history = autoencoder.fit(train_features, train_labels,
                               shuffle=True, epochs=epochs, verbose=0,
                               validation_data=(test_features, test_labels))
@@ -71,13 +77,14 @@ def train(data, blockSize, date, epochs):
             "cons": (my_table.cons.to_numpy() - 1).flatten(),
             "labels": (my_table.label.to_numpy()).flatten()}
     )
-    print(relative_loss(prediction, labels))
     result.to_csv("./result/" + date + "result", index=False)
+    ckpt_save_path = ckpt_manager.save()
+    print('Saving checkpoint  at {}'.format(ckpt_save_path))
 
 
 
 if __name__ == '__main__':
-    date = "2_1/"
+    date = "2_4/"
     file_name = "my_data1"
     data_label = "my_labels1"
     data = cycle.dataset(file_name, data_label)
@@ -89,3 +96,5 @@ if __name__ == '__main__':
     label = data.loc[:, ["labels"]]
     cls.qam_training(modify, qam, 50, 100, "test1_qam", date)
     cls.symbol_training(modify, label, 50, 1000, "test1_symbol", date)
+    cls.qam_training(baseline, qam, 50, 100, "base_line_qam", date)
+    cls.symbol_training(baseline, qam, 50, 1000, "base_line_symbol", date)
