@@ -74,8 +74,7 @@ def log_normal_pdf(sample, mean, logvar, raxis=1):
 
 
 def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
-    C = 0
-    gamma = 100
+
 
     @tf.function
     def train_step(total, label):
@@ -120,6 +119,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                                                                 ckpt_save_path))
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                                time.time() - start))
+            print(pred[:,1,1])
             print(error)
             print(relative_error)
 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     model = CVAE(input_shape=(50, 2, 1), latent_dim=200)
     encoder = model.encoder
     decoder = model.decoder
-    epochs = 1000
+    epochs = 1
     input_shape = (50, 2, 1)
     batchSize = 250
     optimizer = tf.keras.optimizers.Adam(1e-4)
