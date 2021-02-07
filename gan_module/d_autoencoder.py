@@ -75,6 +75,8 @@ def train(data, blockSize, date, epochs):
             "fake_imag": prediction[:, :, 1].flatten(),
             "block": my_table.block,
             "cons": (my_table.cons.to_numpy() - 1).flatten(),
+            "label_real":my_table.label_real,
+            "label_imag":my_table.label_imag,
             "labels": (my_table.label.to_numpy()).flatten()}
     )
     result.to_csv("./result/" + date + "result", index=False)

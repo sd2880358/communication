@@ -254,6 +254,8 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
                 "fake_imag": fake_s.numpy()[:,:, 1].flatten(),
                 "block":data_table.block,
                 "cons": (my_table.cons.to_numpy()-1).flatten(),
+                "label_real":my_table.label_real,
+                "label_imag":my_table.label_imag,
                 "labels": (my_table.label.to_numpy()).flatten()}
             )
             # relative loss between fake signal and signal_hat
@@ -296,7 +298,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 1000
+    EPOCHS = 1
     LAMBDA = 10
     date = "1_31/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
