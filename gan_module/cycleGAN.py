@@ -118,7 +118,7 @@ def noise_loss(noise_output):
 
 
 def identity_loss(real, fake):
-    loss =  tf.reduce_mean(tf.abs(real - fake))
+    loss =  tf.losses.mean_absolute_error(real, fake)
     return LAMBDA * 0.5 * loss
 
 
@@ -229,7 +229,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disen_Loss = [id_loss,relative_loss]
             disen_hist.append(disen_Loss)
 
-        if epoch % 100 == 0:
+        if (epoch + 1) % 100 == 0:
 
             ## measuring the absolute loss between generator and disentanglement
 
@@ -327,5 +327,5 @@ if __name__ == '__main__':
         modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
-        cls.qam_training(modify, qam, 50, 100, "test1_qam")
-        cls.symbol_training(modify, label, 50, 1000, "test1_symbol")
+        #cls.qam_training(modify, qam, 50, 100, "test1_qam")
+        #cls.symbol_training(modify, label, 50, 1000, "test1_symbol")
