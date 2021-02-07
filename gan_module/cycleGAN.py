@@ -61,11 +61,13 @@ def table_data(my_data, cons, label, interference, noise, label_real, label_imag
 
 def make_generator(blockSize):
     model = tf.keras.Sequential()
-    model.add(layers.Conv2D(16, (5, 2), strides=(2, 2), activation="linear", padding='same',
+    model.add(layers.Conv2D(32, (5, 2), strides=(2, 2), activation="linear", padding='same',
                             input_shape=(blockSize, 2, 1)))
-    model.add(layers.Conv2D(8, (5, 1), activation="linear", padding='same'))
+    model.add(layers.Conv2D(16, (5, 1), activation="linear", padding='same'))
+    model.add(layers.Conv2D(8, kernel_size=(5, 1), activation='linear', padding='same'))
     model.add(layers.Conv2DTranspose(8, kernel_size=(5, 1), activation='linear', padding='same'))
     model.add(layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(2, 2), activation='linear', padding='same'))
+    model.add(layers.Conv2DTranspose(32, kernel_size=(5, 2), activation='linear', padding='same'))
     model.add(layers.Conv2D(1, kernel_size=(3, 3), activation='linear', padding='same'))
     return model
 
@@ -242,7 +244,6 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             print("result of fake mixed", fake_mixed[1,1,1])
             print("actual feature", feature[1,1,1])
             print("actual labels", labels[1,1,1])
-            test = discriminator_d(labels)
             fake_s = disentangle_t(feature)
             disen_hist.reverse()
             test_hist = np.array(disen_hist)
@@ -300,7 +301,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 if __name__ == '__main__':
     EPOCHS = 1
     LAMBDA = 10
-    date = "1_31/"
+    date = "2_7/"
     generator_s_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     generator_u_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
     discriminator_d_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -312,7 +313,7 @@ if __name__ == '__main__':
         i = str(i)
         data = "my_data" + i
         data_label = "my_labels" + i
-        file_directory = 'method1'
+        file_directory = 'cycleGAN'
         generator_s = make_generator(blockSize)
         generator_u = make_generator(blockSize)
         discriminator_t = make_discriminator_model(blockSize)
