@@ -133,7 +133,7 @@ if __name__ == '__main__':
     model = CVAE(input_shape=(50, 2, 1), latent_dim=200)
     encoder = model.encoder
     decoder = model.decoder
-    epochs = 1
+    epochs = 1000
     input_shape = (50, 2, 1)
     batchSize = 250
     optimizer = tf.keras.optimizers.Adam(1e-4)
