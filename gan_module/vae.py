@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-
 from tensorflow.keras import layers, losses
 from tensorflow.keras.datasets import fashion_mnist
 from tensorflow.keras.models import Model
@@ -11,12 +10,14 @@ import random
 import time
 import cycleGAN as cycle
 
+
 class Reparameterize(layers.Layer):
     def call(self, inputs):
         Z_mu, Z_logvar = inputs
         epsilon = tf.random.normal(tf.shape(Z_mu))
-        sigma = tf.math.exp(0.5*Z_logvar)
+        sigma = tf.math.exp(0.5 * Z_logvar)
         return Z_mu + sigma * epsilon
+
 
 class CVAE(Model):
     def __init__(self, input_shape, latent_dim=50):
@@ -32,19 +33,21 @@ class CVAE(Model):
         Z_logvar = layers.Dense(self.latent_dim, activation='linear')(X)
         Z = Reparameterize()([Z_mu, Z_logvar])
 
-
         decode_input = layers.Input(shape=latent_dim)
-        X = layers.Reshape((25,1,8))(decode_input)
+        X = layers.Reshape((25, 1, 8))(decode_input)
         X = layers.Conv2DTranspose(8, kernel_size=(5, 1), activation='linear', padding='same')(X)
         X = layers.Conv2DTranspose(16, kernel_size=(5, 2), strides=(2, 2), activation='linear', padding='same')(X)
         decode_output = layers.Conv2D(1, kernel_size=(3, 3), activation='linear', padding='same')(X)
         self.encoder = Model(encoder_input, [Z_mu, Z_logvar, Z])
         self.decoder = Model(decode_input, decode_output)
         self.vae = Model(encoder_input, self.decoder(Z))
+
     def predict(self, inputs):
         return self.vae.predict(inputs)
 
 
+'''
+beta-vae loss function
 def reconstruction_loss(X, X_pred, input_shape):
     mse = tf.losses.MeanSquaredError()
     return mse(X, X_pred) * np.prod(input_shape)
@@ -58,8 +61,16 @@ def kl_divergence(Z_logvar, Z_mu, C, gamma):
 def loss(X, X_pred):
    return reconstruction_loss(X, X_pred) + kl_divergence(X, X_pred)
 
+'''
 
 
+# vae loss function
+
+def log_normal_pdf(sample, mean, logvar, raxis=1):
+    log2pi = tf.math.log(2. * np.pi)
+    return tf.reduce_sum(
+        -.5 * ((sample - mean) ** 2. * tf.exp(logvar) + logvar + log2pi)
+    )
 
 
 def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
@@ -71,17 +82,20 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
         with tf.GradientTape(persistent=True) as tape:
             Z_mu, Z_logvar, Z = model.encoder(total)
             X_pred = model.vae(total)
-            reg_loss = reconstruction_loss(label, X_pred, input_shape)
-            kl_loss = kl_divergence(Z_logvar, Z_mu, C, gamma)
-            total_loss = reg_loss + kl_loss
+            cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=X_pred, labels=total)
+            logpx_z = -tf.reduce_sum(cross_ent, axis=[1,2,3])
+            logpz = log_normal_pdf(Z, Z_mu, Z_logvar)
+            logqz_x = log_normal_pdf(Z, 0., 0.)
+            loss = - tf.reduce_mean(logpx_z + logpz - logqz_x)
 
-        gradients = tape.gradient(total_loss, model.trainable_variables)
+        gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(
             zip(gradients, model.trainable_variables))
+
     checkpoint_path = "./checkpoints/" + date + filePath
     ckpt = tf.train.Checkpoint(model=model, optimizer=optimizer)
     ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
-    
+
     if ckpt_manager.latest_checkpoint:
         ckpt.restore(ckpt_manager.latest_checkpoint)
         print('Latest checkpoint restored!!')
@@ -97,10 +111,10 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
             print('.', end='')
             n += 1
         if epoch % 100 == 0:
-            #error = reconstruction_loss(feature, predicted, input_shape)
+            # error = reconstruction_loss(feature, predicted, input_shape)
             pred = model.predict(feature)
-            error = tf.losses.MeanSquaredError()(pred, feature)
-            relative_error = np.median(abs((pred-feature) / feature))
+            error = tf.losses.MeanAbsoluteError()(pred, feature)
+            relative_error = tf.losses.mean_absolute_percentage_error(pred, feature)
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
@@ -110,21 +124,16 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
             print(relative_error)
 
 
-
-
-
-
-
 if __name__ == '__main__':
-    date = "2_1/"
+    date = "2_7/"
     file_name = "my_data1"
     data_label = "my_labels1"
     file_path = "beta_vae"
     data = cycle.dataset(file_name, data_label)
-    model = CVAE(input_shape=(50,2,1), latent_dim=200)
+    model = CVAE(input_shape=(50, 2, 1), latent_dim=200)
     encoder = model.encoder
     decoder = model.decoder
-    epochs = 1
+    epochs = 100
     input_shape = (50, 2, 1)
     batchSize = 250
     optimizer = tf.keras.optimizers.Adam(1e-4)

@@ -53,7 +53,7 @@ def train(data, blockSize, date, epochs):
     test_labels = test_dataset.loc[:, ['label_real', 'label_imag']].\
         to_numpy().reshape(test_size, blockSize, 2, 1)
     autoencoder = Denoise(blockSize)
-    autoencoder.compile(optimizer="adam", loss=losses.MeanSquaredError(), metrics=[relative_loss])
+    autoencoder.compile(optimizer="adam", loss=losses.MeanAbsoluteError(), metrics=[relative_loss])
     checkpoint_path = "./checkpoints/test4/" + date
     ckpt = tf.train.Checkpoint(autoencoder=autoencoder)
     ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
@@ -88,13 +88,13 @@ if __name__ == '__main__':
     file_name = "my_data1"
     data_label = "my_labels1"
     data = cycle.dataset(file_name, data_label)
-    train(data, 50, date, epochs=100)
+    train(data, 50, date, epochs=1)
     data = pd.read_csv("./result/" + date + "result")
     baseline = data.loc[:, ["real", "imag", "block"]]
     modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
     qam = data.loc[:, ["cons"]]
     label = data.loc[:, ["labels"]]
-    cls.qam_training(modify, qam, 50, 100, "test1_qam", date)
-    cls.symbol_training(modify, label, 50, 1000, "test1_symbol", date)
-    cls.qam_training(baseline, qam, 50, 100, "base_line_qam", date)
-    cls.symbol_training(baseline, qam, 50, 1000, "base_line_symbol", date)
+    #cls.qam_training(modify, qam, 50, 100, "test1_qam", date)
+    #cls.symbol_training(modify, label, 50, 1000, "test1_symbol", date)
+    #cls.qam_training(baseline, qam, 50, 100, "base_line_qam", date)
+    #cls.symbol_training(baseline, qam, 50, 1000, "base_line_symbol", date)
