@@ -137,4 +137,4 @@ if __name__ == '__main__':
     input_shape = (50, 2, 1)
     batchSize = 250
     optimizer = tf.keras.optimizers.Adam(1e-4)
-    start_train(250, 50, data, input_shape, file_path)
+    start_train(250, 50, data, file_path)
