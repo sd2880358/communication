@@ -110,11 +110,11 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
         if n % 10 == 0:
             print('.', end='')
             n += 1
-        if epoch % 100 == 0:
+        if epoch == epochs - 1:
             # error = reconstruction_loss(feature, predicted, input_shape)
             pred = model.predict(feature)
             error = tf.losses.MeanAbsoluteError()(pred, feature)
-            relative_error = tf.losses.mean_absolute_percentage_error(pred, feature)
+            relative_error = tf.losses.MeanAbsolutePercentageError()(pred, feature)
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     model = CVAE(input_shape=(50, 2, 1), latent_dim=200)
     encoder = model.encoder
     decoder = model.decoder
-    epochs = 100
+    epochs = 1
     input_shape = (50, 2, 1)
     batchSize = 250
     optimizer = tf.keras.optimizers.Adam(1e-4)
