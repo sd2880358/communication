@@ -208,7 +208,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             disen_Loss = [id_loss,relative_loss]
             disen_hist.append(disen_Loss)
 
-        if (epoch + 1) % 100 == 0:
+        if epoch == EPOCHS - 1:
 
             ## measuring the absolute loss between generator and disentanglement
 
