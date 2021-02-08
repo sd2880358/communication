@@ -90,10 +90,9 @@ sparse_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 mean_abs_loss = tf.keras.losses.MeanAbsoluteError()
 
 
-def classifier_loss(real, fake, label):
-    real_loss = sparse_entropy(label, real)
+def classifier_loss(fake, label):
     fake_loss = sparse_entropy(label, fake)
-    total_loss = real_loss + fake_loss
+    total_loss = fake_loss
     return total_loss
 
 
@@ -149,12 +148,10 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             fake_s = classifier(s, training=True)
             real = classifier(label, training=True)
             id_loss = identity_loss(fake_s, real)
-            gen_loss = generator_loss(fake_s, symbol)
-            cls_loss = classifier_loss(real, fake_s, symbol)
-            gen_total_loss = id_loss + gen_loss
+            cls_loss = classifier_loss(fake_s, symbol)
+            gen_total_loss = id_loss + cls_loss
         gradients_of_generator = tape.gradient(gen_total_loss, generator.trainable_variables)
         gradients_of_classifier = tape.gradient(cls_loss, classifier.trainable_variables)
-
         generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
         classifier_optimizer.apply_gradients(
             zip(gradients_of_classifier, classifier.trainable_variables))
