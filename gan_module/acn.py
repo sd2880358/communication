@@ -250,11 +250,11 @@ if __name__ == '__main__':
         generator = make_generator(blockSize)
         classifier = make_classifier(blockSize)
         data_table = dataset(data, data_label)
-        #start_train(250, blockSize, data_table, file_directory)
+        start_train(250, blockSize, data_table, file_directory)
         data = pd.read_csv("./result/"+date+file_directory+"result")
         baseline = data.loc[:, ["real", "imag", "block"]]
         modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
         #cls.qam_training(modify, qam, 50, 100, "test1_qam")
-        cls.symbol_training(baseline, label, 50, 1000, "test1_symbol")
+        #cls.symbol_training(baseline, label, 50, 1000, "test1_symbol")
