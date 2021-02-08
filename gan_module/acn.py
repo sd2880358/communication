@@ -90,8 +90,8 @@ sparse_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 mean_abs_loss = tf.keras.losses.MeanAbsoluteError()
 
 
-def classifier_loss(fake, label):
-    fake_loss = sparse_entropy(label, fake)
+def classifier_loss(real, label):
+    fake_loss = sparse_entropy(label, real)
     total_loss = fake_loss
     return total_loss
 
@@ -147,8 +147,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             s = generator(total, training=True)
             fake_s = classifier(s, training=True)
             id_loss = identity_loss(s, label)
-            cls_loss = classifier_loss(fake_s, symbol)
-            gen_total_loss = id_loss + cls_loss
+            cls_loss = classifier_loss(label, symbol)
+            gen_loss = generator_loss(fake_s, symbol)
+            gen_total_loss = id_loss + gen_loss
         gradients_of_generator = tape.gradient(gen_total_loss, generator.trainable_variables)
         gradients_of_classifier = tape.gradient(cls_loss, classifier.trainable_variables)
         generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
@@ -239,14 +240,14 @@ if __name__ == '__main__':
     EPOCHS = 500
     LAMBDA = 10
     date = "2_7/"
-    generator_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
-    classifier_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
+    generator_optimizer = tf.keras.optimizers.Adam(1e-3, beta_1=0.5)
+    classifier_optimizer = tf.keras.optimizers.Adam(1e-3, beta_1=0.5)
     for i in range(1, 2):
         blockSize = 50
         i = str(i)
         data = "my_data" + i
         data_label = "my_labels" + i
-        file_directory = 'acn'
+        file_directory = 'acn_test2'
         generator = make_generator(blockSize)
         classifier = make_classifier(blockSize)
         data_table = dataset(data, data_label)
