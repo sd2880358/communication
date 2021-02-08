@@ -146,8 +146,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         with tf.GradientTape(persistent=True) as tape:
             s = generator(total, training=True)
             fake_s = classifier(s, training=True)
-            real = classifier(label, training=True)
-            id_loss = identity_loss(fake_s, real)
+            id_loss = identity_loss(s, label)
             cls_loss = classifier_loss(fake_s, symbol)
             gen_total_loss = id_loss + cls_loss
         gradients_of_generator = tape.gradient(gen_total_loss, generator.trainable_variables)
@@ -237,7 +236,7 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
 
 
 if __name__ == '__main__':
-    EPOCHS = 100
+    EPOCHS = 500
     LAMBDA = 10
     date = "2_7/"
     generator_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
@@ -251,11 +250,11 @@ if __name__ == '__main__':
         generator = make_generator(blockSize)
         classifier = make_classifier(blockSize)
         data_table = dataset(data, data_label)
-        start_train(250, blockSize, data_table, file_directory)
+        #start_train(250, blockSize, data_table, file_directory)
         data = pd.read_csv("./result/"+date+file_directory+"result")
         baseline = data.loc[:, ["real", "imag", "block"]]
         modify = data.loc[:, ["fake_real", "fake_imag", "block"]]
         qam = data.loc[:, ["cons"]]
         label = data.loc[:, ["labels"]]
         #cls.qam_training(modify, qam, 50, 100, "test1_qam")
-        #cls.symbol_training(modify, label, 50, 1000, "test1_symbol")
+        cls.symbol_training(baseline, label, 50, 1000, "test1_symbol")
