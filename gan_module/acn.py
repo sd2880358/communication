@@ -146,8 +146,9 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
         with tf.GradientTape(persistent=True) as tape:
             s = generator(total, training=True)
             fake_s = classifier(s, training=True)
+            real_s = classifier(label, symbol)
             id_loss = identity_loss(s, label)
-            cls_loss = classifier_loss(label, symbol)
+            cls_loss = classifier_loss(real_s, symbol)
             gen_loss = generator_loss(fake_s, symbol)
             gen_total_loss = id_loss + gen_loss
         gradients_of_generator = tape.gradient(gen_total_loss, generator.trainable_variables)
