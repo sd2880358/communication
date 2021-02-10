@@ -19,11 +19,11 @@ class Reparameterize(layers.Layer):
         return Z_mu + sigma * epsilon
 
 class CVAE(Model):
-    def __init__(self, input_shape, latent_dim=50):
+    def __init__(self, input_shape, latent_dim=50, gamma=1):
         super(CVAE, self).__init__()
         self.C = 0
         self.latent_dim = latent_dim
-        self.gamma = 100
+        self.gamma = gamma
         encoder_input = layers.Input(shape=input_shape)
         X = layers.Conv2D(16, (5, 2), strides=(2, 2), activation="linear", padding='same')(encoder_input)
         X = layers.Conv2D(8, (5, 1), activation="linear", padding='same')(X)
@@ -47,14 +47,12 @@ class CVAE(Model):
 
 #beta-vae loss function
 def reconstruction_loss(X, X_pred, input_shape):
-    mse = tf.losses.MeanSquaredError()
+    mse = tf.losses.MeanAbsoluteError()
     return mse(X, X_pred) * np.prod(input_shape)
 
 def kl_divergence(Z_logvar, Z_mu, C, gamma):
-    C += (1/1440)
-    C = min(C, 35)
     kl = -0.5 * tf.reduce_mean(1 + Z_logvar - Z_mu**2 - tf.math.exp(Z_logvar))
-    return gamma * tf.math.abs(kl - C)
+    return gamma * tf.math.abs(kl)
 
 def loss(X, X_pred):
    return reconstruction_loss(X, X_pred) + kl_divergence(X, X_pred)
@@ -72,22 +70,19 @@ def log_normal_pdf(sample, mean, logvar, raxis=1):
 
 
 
-def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
+def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath, date):
     C = 0
-    gamma = 100
+    gamma=1
 
     @tf.function
     def train_step(total, label):
         with tf.GradientTape(persistent=True) as tape:
-            Z_mu, Z_logvar, Z = model.encoder(total)
-            X_pred = model.vae(total)
-            beta-vae
+            Z_mu, Z_logvar, Z = model.encoder(label)
+            X_pred = model.vae(label)
+            #beta-vae
             reg_loss = reconstruction_loss(label, X_pred, input_shape)
             kl_loss = kl_divergence(Z_logvar, Z_mu, C, gamma)
             total_loss = reg_loss + kl_loss
-
-
-
         gradients = tape.gradient(total_loss, model.trainable_variables)
         optimizer.apply_gradients(
             zip(gradients, model.trainable_variables))
@@ -109,11 +104,11 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
         if n % 10 == 0:
             print('.', end='')
             n += 1
-        if epoch % 100 == 0:
+        if (epoch+1) % 100 == 0:
             #error = reconstruction_loss(feature, predicted, input_shape)
-            pred = model.predict(feature)
-            error = tf.losses.MeanSquaredError()(pred, feature)
-            relative_error = np.median(abs((pred-feature) / feature))
+            pred = model.predict(labels)
+            error = tf.losses.MeanAbsoluteError()(pred, labels)
+            relative_error = tf.losses.MeanAbsolutePercentageError()(pred, labels)
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
@@ -121,6 +116,16 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, input_shape, filePath):
                                                                time.time() - start))
             print(error)
             print(relative_error)
+            result = pd.DataFrame(
+                  {
+                "fake_real": pred[:, :, 0].flatten(),
+                "fake_imag": pred[:,:, 1].flatten(),
+                "cons": (my_table.cons.to_numpy()-1).flatten(),
+                "label_real":labels.numpy()[:, :, 0].flatten(),
+                "label_imag":labels.numpy()[:, :, 1].flatten(),
+                "labels": symbol.numpy().flatten()}
+            )
+            result.to_csv("./result/"+ date + filePath)
 
 
 
@@ -134,11 +139,11 @@ if __name__ == '__main__':
     data_label = "my_labels1"
     file_path = "beta_vae"
     data = cycle.dataset(file_name, data_label)
-    model = CVAE(input_shape=(50,2,1), latent_dim=200)
+    model = CVAE(input_shape=(50,2,1), latent_dim=200, gamma=1)
     encoder = model.encoder
     decoder = model.decoder
-    epochs = 1
+    epochs = 100
     input_shape = (50, 2, 1)
     batchSize = 250
     optimizer = tf.keras.optimizers.Adam(1e-4)
-    start_train(250, 50, data, input_shape, file_path)
+    start_train(250, 50, data, input_shape, file_path, date)

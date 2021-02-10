@@ -79,13 +79,13 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
     @tf.function
     def train_step(total, label):
         with tf.GradientTape(persistent=True) as tape:
-            Z_mu, Z_logvar, Z = model.encoder(total)
-            X_pred = model.vae(total)
-            cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=X_pred, labels=total)
+            Z_mu, Z_logvar, Z = model.encoder(label)
+            X_pred = model.vae(label)
+            cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=X_pred, labels=label)
             logpx_z = -tf.reduce_sum(cross_ent, axis=[1,2,3])
             logpz = log_normal_pdf(Z, Z_mu, Z_logvar)
             logqz_x = log_normal_pdf(Z, 0., 0.)
-            loss = - tf.reduce_mean(logpx_z + logpz - logqz_x)
+            loss = tf.reduce_mean(logpx_z + logpz - logqz_x)
 
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(
@@ -111,29 +111,38 @@ def start_train(BATCH_SIZE, BUFFER_SIZE, data, filePath):
             n += 1
         if epoch == epochs - 1:
             # error = reconstruction_loss(feature, predicted, input_shape)
-            pred = model.predict(feature)
-            error = tf.losses.MeanAbsoluteError()(pred, feature)
-            relative_error = tf.losses.MeanAbsolutePercentageError()(pred, feature)
+            pred = model.predict(labels)
+            error = tf.losses.MeanAbsoluteError()(pred, labels)
+            relative_error = tf.losses.MeanAbsolutePercentageError()(pred, labels)
             ckpt_save_path = ckpt_manager.save()
             print('Saving checkpoint for epoch {} at {}'.format(epoch + 1,
                                                                 ckpt_save_path))
             print('Time taken for epoch {} is {} sec\n'.format(epoch + 1,
                                                                time.time() - start))
-            print(pred[:,1,1])
             print(error)
             print(relative_error)
+            result = pd.DataFrame(
+                  {
+                "fake_real": pred[:, :, 0].flatten(),
+                "fake_imag": pred[:,:, 1].flatten(),
+                "cons": (my_table.cons.to_numpy()-1).flatten(),
+                "label_real":my_table.label_real,
+                "label_imag":my_table.label_imag,
+                "labels": (my_table.label.to_numpy()).flatten()}
+            )
+            result.to_csv("./result/"+ date + filePath)
 
 
 if __name__ == '__main__':
     date = "2_7/"
     file_name = "my_data1"
     data_label = "my_labels1"
-    file_path = "beta_vae"
+    file_path = "vae"
     data = cycle.dataset(file_name, data_label)
     model = CVAE(input_shape=(50, 2, 1), latent_dim=200)
     encoder = model.encoder
     decoder = model.decoder
-    epochs = 1
+    epochs = 100
     input_shape = (50, 2, 1)
     batchSize = 250
     optimizer = tf.keras.optimizers.Adam(1e-4)
